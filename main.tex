@@ -13,8 +13,7 @@
 %----------------------------------------------------------------------------------------
 %	PREAMBULE // PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
-\documentclass[a4paper,12pt,twoside,french]{book}
-[a4paper,12pt,twoside]
+\documentclass[a4paper,12pt,twoside,english]{book}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{babel}
@@ -36,15 +35,25 @@
     urlcolor=black,
     citecolor=black,
     pdfpagemode=FullScreen,
-    }
+}
 \usepackage[
-    %backend=biber, 
+    backend=biber, 
     natbib=true,
     style=numeric,
     sorting=none
 ]{biblatex} %Imports biblatex package
+\usepackage{csquotes}
 
-\addbibresource{biblio.bib} %Import the bibliography file
+\addbibresource{
+	bibliography/intro.bib,
+	bibliography/chap11.bib,
+	bibliography/chap12.bib,
+	bibliography/chap13.bib,
+	bibliography/chap21.bib,
+	bibliography/chap22.bib,
+	bibliography/chap23.bib,
+	bibliography/chap24.bib
+} %Import the bibliography file
 
 \usepackage{graphicx} % to include images
 %\usepackage[pdftex]{graphicx}
@@ -61,15 +70,15 @@
 \usepackage{tikz}
 \usepackage{fancyhdr}
 \pagestyle{fancy}
+\setlength{\headheight}{15pt}
 \usepackage[strict]{changepage}
 \usepackage{siunitx}
-\selectlanguage{french}%
 
 \usepackage{enumitem}
 \usepackage{epigraph}
 %\usetikzlibrary{shadows.blur}
 \usepackage{lscape}
-\usepackage{titletoc}
+%\usepackage{titletoc}
 \usepackage{mdframed}
 
 \usepackage{tabu}
@@ -78,19 +87,19 @@
 \usepackage{arydshln}
 %\usepackage[nonumberlist]{glossaries}
 \usepackage{calc}
-\usepackage[]{titlesec} 
+%\usepackage[]{titlesec} 
 \definecolor{linkColor}{HTML}{32a852}
 %\usepackage[colorlinks=true,citecolor=linkColor,linkcolor=black]{hyperref}
 
-\addto\captionsfrench{%
-  \renewcommand{\listfigurename}{Liste des figures}%
-}
+%\addto\captionsfrench{%
+%  \renewcommand{\listfigurename}{Liste des figures}%
+%}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\usepackage{sectsty}
+%\usepackage{sectsty}
 %\sectionfont{\color{CentraleRed}}  % sets colour of sections
 %\subsectionfont{\color{uclablue}}  % sets colour of subsections, ou gray, teal 
 \definecolor{darkseagreen}{rgb}{0.56, 0.74, 0.56}
@@ -119,7 +128,7 @@
 
 %%%%%%Glossaire
 %\usepackage{glossaries}
-\usepackage[acronym,xindy,toc]{glossaries} % nomain, if you define glossaries in a file, and you use \include{INP-00-glossary}
+\usepackage[acronym,toc,xindy,nomain]{glossaries} % nomain, if you define glossaries in a file, and you use \include{INP-00-glossary}
 %[nomain,acronym,xindy,toc]
 \makeglossaries
 
@@ -148,7 +157,7 @@
 		\begin{center}
 		
 \vspace*{.03\textheight}
-\textsc{\LARGE Université Paris Cité}\\[0.2cm] % Univ name
+\textsc{\LARGE Sorbonne Université}\\[0.2cm] % Univ name
 		\large École doctorale [Nom et numéro identifiant]\\
 		  Laboratoire \\ 
         %Équipe de recherche\\
@@ -225,6 +234,10 @@ L’Enfer – Chant XXXI, La Divine Comédie, Dante Alighieri
 %----------------------------------------------------------------------------------------
 \input{auxilliaires/remerciements}
 
+%----------------------------------------------------------------------------------------
+%	AVANT-PROPOS
+%----------------------------------------------------------------------------------------
+\input{auxilliaires/avant-propos.tex}
 
 %----------------------------------------------------------------------------------------
 %	LIST OF CONTENTS/FIGURES/TABLES PAGES
@@ -233,9 +246,9 @@ L’Enfer – Chant XXXI, La Divine Comédie, Dante Alighieri
 %\setcounter{tocdepth}{3}
 \tableofcontents % Prints the main table of contents
 \listoffigures % Prints the list of figures
-\addcontentsline{toc}{chapter}{Liste des figures}
+\addcontentsline{toc}{chapter}{List of figures}
 \listoftables % Prints the list of tables
-\addcontentsline{toc}{chapter}{Liste des tableaux}
+\addcontentsline{toc}{chapter}{Liste of tables}
 \newpage
 
 
@@ -255,45 +268,66 @@ L’Enfer – Chant XXXI, La Divine Comédie, Dante Alighieri
 %\titlespacing*{\section}{0pt}{.9em}{.8em}
 \renewcommand{\baselinestretch}{1.1}
 
-\fancyhead[RO]{\leftmark}
-\fancyhead[LE]{\textsc{\chaptername~\thechapter}}
-
-%\chapter*{Introduction}
 \fancyhead{} % clear all header fields
-\fancyhead[OL]{\textsc{Avant-propos}}
-\input{chapters/intro.tex} %partie introduction ou avant-propos
-
-\fancyhead{} % clear all header fields
-
 \fancyhead[RO]{\leftmark}
+\begin{refsection}[bibliography/intro]
+	\input{chapters/intro.tex} %partie introduction ou avant-propos
+	\printbibliography[heading=subbibintoc]
+\end{refsection}
+
 \fancyhead[LE]{\textsc{\chaptername~\thechapter}}
+\part{Datasets}
+\begin{refsection}[bibliography/chap11]
+	\input{chapters/chap11}
+	\printbibliography[heading=subbibintoc, resetnumbers=true]
+\end{refsection}
 
-\input{chapters/chap1}
-\input{chapters/chap2}
+\begin{refsection}[bibliography/chap12]
+	\input{chapters/chap12}
+	\printbibliography[heading=subbibintoc, resetnumbers=true]
+\end{refsection}
 
+\begin{refsection}[bibliography/chap13]
+	\input{chapters/chap13}
+	\printbibliography[heading=subbibintoc,resetnumbers=true]
+\end{refsection}
+
+\part{Signal approximation and preconditioning}
+\begin{refsection}[bibliography/chap21]
+	\input{chapters/chap21}
+	\printbibliography[heading=subbibintoc, resetnumbers=true]
+\end{refsection}
+
+\begin{refsection}[bibliography/chap22]
+	\input{chapters/chap22}
+	\printbibliography[heading=subbibintoc, resetnumbers=true]
+\end{refsection}
+
+\begin{refsection}[bibliography/chap23]
+	\input{chapters/chap23}
+	\printbibliography[heading=subbibintoc, resetnumbers=true]
+\end{refsection}
+
+\begin{refsection}[bibliography/chap24]
+	\input{chapters/chap24}
+	\printbibliography[heading=subbibintoc, resetnumbers=true]
+\end{refsection}
+
+\newpage
+\fancyhead[LE]{}
 \input{chapters/objectifs}
-
-%\input{chapters/article}
-%\input{chapters/chaptercontrib}
-
-%\part*{Discussion et conclusion générale}
-\fancyhead{} % clear all header fields
-\fancyhead[OL]{\textsc{Discussion et perspectives}}
 \input{chapters/discussion.tex}
-
-\fancyhead{} % clear all header fields
-\fancyhead[OL]{\textsc{Conclusion}}
 \input{chapters/conclusion.tex}
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
 %----------------------------------------------------------------------------------------
 %\printbibliography %Prints bibliography
-\fancyhead{} % clear all header fields
-\fancyhead[OL]{\textsc{Bibliographie}}
-\printbibliography[
-heading=bibintoc,
-title={Bibliographie "Adaptez le style bibliographique en fonction de votre discipline"}]
+%\fancyhead{} % clear all header fields
+%\fancyhead[RO]{\textsc{Bibliography}}
+%\printbibliography[
+%heading=bibintoc,
+%title={Bibliography}]
 
 %----------------------------------------------------------------------------------------
 
