@@ -1,34 +1,816 @@
-@ARTICLE{Ruppell1842,
-  title    = "Heterocephalus  nov.  gen.  uber  sau-gethiere  aus  der  ordnung  der  nager",
-  author   = "Rüppell E",
-  journal  = "Museum Senkenbergianum Abhandlungen",
-  volume   =   3,
-  pages    = "99",
-  year     =  1842,
-  language = "en"
+@inproceedings{
+otness2021an,
+title={An Extensible Benchmark Suite for Learning to Simulate Physical Systems},
+author={Karl Otness and Arvi Gjoka and Joan Bruna and Daniele Panozzo and Benjamin Peherstorfer and Teseo Schneider and Denis Zorin},
+booktitle={Thirty-fifth Conference on Neural Information Processing Systems Datasets and Benchmarks Track (Round 1)},
+year={2021},
+url={https://openreview.net/forum?id=pY9MHwmrymR}
+}
+
+@inproceedings{
+bonnet2022an,
+title={An extensible Benchmarking Graph-Mesh dataset for studying Steady-State Incompressible Navier-Stokes Equations},
+author={Florent Bonnet and Jocelyn Ahmed Mazari and Thibaut Munzer and Pierre Yser and Patrick Gallinari},
+booktitle={ICLR 2022 Workshop on Geometrical and Topological Representation Learning},
+year={2022},
+url={https://openreview.net/forum?id=rqUUi4-kpeq}
+}
+
+@misc{TMR,
+  author = {NASA Langley Research Center},
+  title = {Turbulence Modeling Resource},
+  year = 2021,
+  howpublished = {\url{https://turbmodels.larc.nasa.gov/}},
+  note = {Accessed: 2022-05-19}
+}
+
+@misc{UIUC,
+  author = {Michael Selig},
+  title = {{UIUC Airfoil Database}},
+  year = 2022,
+  howpublished = {\url{https://m-selig.ae.illinois.edu/ads/coord_database.html}},
+  note = {Accessed: 2022-08-22}
+}
+
+@article{NACA0012-1,
+  author = {Charles L. Ladson, Acquilla S. Hill and William G. Johnson, Jr.},
+  title = {Pressure Distributions From High Reynolds Number Transonic Tests of an {NACA} 0012 Airfoil in the {Langley} 0.3-Meter Transonic Cryogenic Tunnel},
+  journal = {NASA Technical Memorandum 100526},
+  month = {12},
+  year = {1987}
+}
+
+@article{NACA0012-2,
+  author = {Charles L. Ladson},
+  title = {Effects of Independent Variation of Mach and {Reynolds} Numbers on the Low-Speed Aerodynamic Characteristics of the {NACA} 0012 Airfoil Section},
+  journal = {NASA Technical Memorandum 4074},
+  month = {10},
+  year = {1988}
+}
+
+@article{NACA4412,
+  author = {Alan J. Wadcock},
+  title = {Structure of the Turbulent Separated Flow Around a Stalled Airfoil},
+  journal = {NASA Contractor Report 152263},
+  month = {2},
+  year = {1979}
+}
+
+@article{SST,
+  author = {Menter, F. R. and Kuntz, M. and Langtry, R.},
+  year = {2003},
+  month = {},
+  pages = {625-632},
+  title = {Ten years of industrial experience with the {SST} turbulence model},
+  volume = {4},
+  journal = {Turbulence, Heat and Mass Transfer}
+}
+
+@inproceedings{SIMPLE,
+  author="Caretto, L. S.
+  and Gosman, A. D.
+  and Patankar, S. V.
+  and Spalding, D. B.",
+  editor="Cabannes, Henri
+  and Temam, Roger",
+  title="Two calculation procedures for steady, three-dimensional flows with recirculation",
+  booktitle="Proceedings of the Third International Conference on Numerical Methods in Fluid Mechanics",
+  year="1973",
+  publisher="Springer Berlin Heidelberg",
+  address="Berlin, Heidelberg",
+  pages="60--68",
+  isbn="978-3-540-38392-5"
+}
+
+@article{SIMPLEC,
+  author = {J. P. Van Doormaal and G. D. Raithby},
+  title = {Enhancements of the {SIMPLE} Method for Predicting Incompressible Fluid Flows},
+  journal = {Numerical Heat Transfer},
+  volume = {7},
+  number = {2},
+  pages = {147-163},
+  year  = {1984},
+  publisher = {Taylor and Francis},
+  doi = {10.1080/01495728408961817},
+}
+
+@book{paraview,
+  author = {Ayachit, Utkarsh},
+  title = {The ParaView Guide: A Parallel Visualization Application},
+  year = {2015},
+  isbn = {978-1930934306},
+  publisher = {Kitware},
+}
+
+@article{OpenFOAM,
+  author = {Weller, H. G. and Tabor, G. and Jasak, H. and Fureby,C.},
+  title = {A tensorial approach to computational continuum mechanics using object-oriented techniques},
+  journal = {Computers in Physics},
+  volume = {12},
+  number = {6},
+  pages = {620-631},
+  year = {1998},
+  doi = {10.1063/1.168744},
+  howpublished = {\url{https://www.openfoam.com/news/main-news/openfoam-v2112}},
+}
+
+@article{pyvista,
+  doi = {10.21105/joss.01450},
+  url = {https://doi.org/10.21105/joss.01450},
+  year = {2019},
+  publisher = {The Open Journal},
+  volume = {4},
+  number = {37},
+  pages = {1450},
+  author = {C. Bane Sullivan and Alexander A. Kaszynski},
+  title = {{PyVista: 3D plotting and mesh analysis through a streamlined interface for the Visualization Toolkit (VTK)}},
+  journal = {Journal of Open Source Software}
+}
+
+@book{aero,
+  title = "Fundamentals of aerodynamics (6th edition)",
+  author = "J. Anderson",
+  year = 2017,
+  publisher = "McGraw-Hill Education",
+}
+
+@book{landau,
+  title={Fluid {M}echanics: {V}olume 6},
+  author={Landau, L.D. and Lifshitz, E.M.},
+  isbn={9781483140506},
+  year={2013},
+  publisher={Elsevier Science}
+}
+
+@book{wilcox,
+author = {Wilcox, David},
+year = {2006},
+pages = {},
+title = {Turbulence {M}odeling for {CFD} (3rd Edition)},
+publisher={DCW Industries, Incorporated}
+}
+
+@article{spalart,
+author = {Spalart, P. and Allmaras, S.},
+year = {1992},
+title = {A One-Equation Turbulence Model for Aerodynamic Flows},
+volume = {439},
+journal = {AIAA},
+doi = {10.2514/6.1992-439}
+}
+
+@article{komega,
+author = {Wilcox, David C.},
+title = {Formulation of the k-w Turbulence Model Revisited},
+journal = {AIAA Journal},
+volume = {46},
+number = {11},
+pages = {2823-2838},
+year = {2008},
+doi = {10.2514/1.36541},
+}
+
+@article{kepsilon,
+title = {The numerical computation of turbulent flows},
+journal = {Computer Methods in Applied Mechanics and Engineering},
+volume = {3},
+number = {2},
+pages = {269-289},
+year = {1974},
+issn = {0045-7825},
+doi = {https://doi.org/10.1016/0045-7825(74)90029-2},
+author = {B.E. Launder and D.B. Spalding}
+}
+
+@inbook{naca, 
+place={Cambridge}, 
+series={Cambridge Aerospace Series}, 
+title={Applied Computational Aerodynamics: A Modern Engineering Approach}, 
+DOI={10.1017/CBO9781107284166}, 
+publisher={Cambridge University Press}, 
+author={Cummings, Russell M. and Mason, William H. and Morton, Scott A. and McDaniel, David R.},
+pages = {731-765}, 
+year={2015}, 
+collection={Cambridge Aerospace Series}
+}
+
+@inproceedings{deq,
+ author = {Bai, Shaojie and Kolter, J. Zico and Koltun, Vladlen},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {H. Wallach and H. Larochelle and A. Beygelzimer and F. d\textquotesingle Alch\'{e}-Buc and E. Fox and R. Garnett},
+ pages = {},
+ publisher = {Curran Associates, Inc.},
+ title = {Deep Equilibrium Models},
+ url = {https://proceedings.neurips.cc/paper/2019/file/01386bd6d8e091c2ab4c7c7de644d37b-Paper.pdf},
+ volume = {32},
+ year = {2019}
+}
+
+@article{pinns,
+title = {Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations},
+journal = {Journal of Computational Physics},
+volume = {378},
+pages = {686-707},
+year = {2019},
+issn = {0021-9991},
+doi = {https://doi.org/10.1016/j.jcp.2018.10.045},
+url = {https://www.sciencedirect.com/science/article/pii/S0021999118307125},
+author = {M. Raissi and P. Perdikaris and G.E. Karniadakis}
+}
+
+@inproceedings{hnn,
+ author = {Greydanus, Samuel and Dzamba, Misko and Yosinski, Jason},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {H. Wallach and H. Larochelle and A. Beygelzimer and F. d\textquotesingle Alch\'{e}-Buc and E. Fox and R. Garnett},
+ pages = {},
+ publisher = {Curran Associates, Inc.},
+ title = {Hamiltonian Neural Networks},
+ url = {https://proceedings.neurips.cc/paper/2019/file/26cd8ecadce0d4efd6cc8a8725cbd1f8-Paper.pdf},
+ volume = {32},
+ year = {2019}
+}
+
+@article{dgm,
+title = {DGM: A deep learning algorithm for solving partial differential equations},
+journal = {Journal of Computational Physics},
+volume = {375},
+pages = {1339-1364},
+year = {2018},
+issn = {0021-9991},
+doi = {https://doi.org/10.1016/j.jcp.2018.08.029},
+url = {https://www.sciencedirect.com/science/article/pii/S0021999118305527},
+author = {Justin Sirignano and Konstantinos Spiliopoulos},
+keywords = {Partial differential equations, Machine learning, Deep learning, High-dimensional partial differential equations}
+}
+
+@article{tu2014,
+title = {On dynamic mode decomposition:  Theory and applications},
+journal = {Journal of Computational Dynamics},
+volume = {1},
+number = {2},
+pages = {391-421},
+year = {2014},
+author = {Jonathan H. Tu and Clarence W. Rowley and Dirk M. Luchtenburg and Steven L. Brunton and J. Nathan Kutz},
+}
+
+@article{koopman,
+author = {Brunton, Steven L. and Budišić, Marko and Kaiser, Eurika and Kutz, J. Nathan},
+title = {Modern Koopman Theory for Dynamical Systems},
+journal = {SIAM Review},
+volume = {64},
+number = {2},
+pages = {229-340},
+year = {2022},
+doi = {10.1137/21M1401243}
+}
+
+@article{Rudy2017,
+author = {Samuel H. Rudy  and Steven L. Brunton  and Joshua L. Proctor  and J. Nathan Kutz },
+title = {Data-driven discovery of partial differential equations},
+journal = {Science Advances},
+volume = {3},
+number = {4},
+pages = {e1602614},
+year = {2017},
+doi = {10.1126/sciadv.1602614}
+}
+
+@InProceedings{pmlr-v80-long18a,
+  title = 	 {{PDE}-Net: Learning {PDE}s from Data},
+  author =       {Long, Zichao and Lu, Yiping and Ma, Xianzhong and Dong, Bin},
+  booktitle = 	 {Proceedings of the 35th International Conference on Machine Learning},
+  pages = 	 {3208--3216},
+  year = 	 {2018},
+  editor = 	 {Dy, Jennifer and Krause, Andreas},
+  volume = 	 {80},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {7},
+  publisher =    {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v80/long18a/long18a.pdf},
+  url = 	 {https://proceedings.mlr.press/v80/long18a.html}
+}
+
+@inproceedings{mgno,
+ author = {Li, Zongyi and Kovachki, Nikola and Azizzadenesheli, Kamyar and Liu, Burigede and Stuart, Andrew and Bhattacharya, Kaushik and Anandkumar, Anima},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {H. Larochelle and M. Ranzato and R. Hadsell and M.F. Balcan and H. Lin},
+ pages = {6755--6766},
+ publisher = {Curran Associates, Inc.},
+ title = {Multipole Graph Neural Operator for Parametric Partial Differential Equations},
+ url = {https://proceedings.neurips.cc/paper/2020/file/4b21cf96d4cf612f239a6c322b10c8fe-Paper.pdf},
+ volume = {33},
+ year = {2020}
+}
+
+@article{Kovachki2021NeuralOL,
+  title={Neural Operator: Learning Maps Between Function Spaces},
+  author={Nikola B. Kovachki and Zong-Yi Li and Burigede Liu and Kamyar Azizzadenesheli and Kaushik Bhattacharya and Andrew Stuart and Anima Anandkumar},
+  journal={ArXiv},
+  year={2021},
+  volume={abs/2108.08481}
+}
+
+@article{lu2021learning,
+  title   = {Learning nonlinear operators via {DeepONet} based on the universal approximation theorem of operators},
+  author  = {Lu, Lu and Jin, Pengzhan and Pang, Guofei and Zhang, Zhongqiang and Karniadakis, George Em},
+  journal = {Nature Machine Intelligence},
+  volume  = {3},
+  number  = {3},
+  pages   = {218--229},
+  year    = {2021}
+}
+
+@inproceedings{fno,
+title={Fourier Neural Operator for Parametric Partial Differential Equations},
+author={Zongyi Li and Nikola Borislavov Kovachki and Kamyar Azizzadenesheli and Burigede liu and Kaushik Bhattacharya and Andrew Stuart and Anima Anandkumar},
+booktitle={International Conference on Learning Representations},
+year={2021},
+url={https://openreview.net/forum?id=c8P9NQVtmnO}
+}
+
+@inproceedings{Chen2020,
+title={Symplectic Recurrent Neural Networks},
+author={Zhengdao Chen and Jianyu Zhang and Martin Arjovsky and Léon Bottou},
+booktitle={International Conference on Learning Representations},
+year={2020},
+url={https://openreview.net/forum?id=BkgYPREtPr}
+}
+
+@inproceedings{de2018deep,
+title={Deep Learning for Physical Processes: Incorporating Prior Scientific Knowledge},
+author={Emmanuel de Bezenac and Arthur Pajot and Patrick Gallinari},
+booktitle={International Conference on Learning Representations},
+year={2018},
+url={https://openreview.net/forum?id=By4HsfWAZ},
+}
+
+@inproceedings{imagenet,
+ author = {Krizhevsky, Alex and Sutskever, Ilya and Hinton, Geoffrey E},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {F. Pereira and C.J. Burges and L. Bottou and K.Q. Weinberger},
+ pages = {},
+ publisher = {Curran Associates, Inc.},
+ title = {ImageNet Classification with Deep Convolutional Neural Networks},
+ url = {https://proceedings.neurips.cc/paper/2012/file/c399862d3b9d6b76c8436e924a68c45b-Paper.pdf},
+ volume = {25},
+ year = {2012}
+}
+
+@InProceedings{pmlr-v48-amodei16,
+  title = 	 {Deep Speech 2 : End-to-End Speech Recognition in English and Mandarin},
+  author = 	 {Amodei, Dario and Ananthanarayanan, Sundaram and Anubhai, Rishita and Bai, Jingliang and Battenberg, Eric and Case, Carl and Casper, Jared and Catanzaro, Bryan and Cheng, Qiang and Chen, Guoliang and Chen, Jie and Chen, Jingdong and Chen, Zhijie and Chrzanowski, Mike and Coates, Adam and Diamos, Greg and Ding, Ke and Du, Niandong and Elsen, Erich and Engel, Jesse and Fang, Weiwei and Fan, Linxi and Fougner, Christopher and Gao, Liang and Gong, Caixia and Hannun, Awni and Han, Tony and Johannes, Lappi and Jiang, Bing and Ju, Cai and Jun, Billy and LeGresley, Patrick and Lin, Libby and Liu, Junjie and Liu, Yang and Li, Weigao and Li, Xiangang and Ma, Dongpeng and Narang, Sharan and Ng, Andrew and Ozair, Sherjil and Peng, Yiping and Prenger, Ryan and Qian, Sheng and Quan, Zongfeng and Raiman, Jonathan and Rao, Vinay and Satheesh, Sanjeev and Seetapun, David and Sengupta, Shubho and Srinet, Kavya and Sriram, Anuroop and Tang, Haiyuan and Tang, Liliang and Wang, Chong and Wang, Jidong and Wang, Kaifu and Wang, Yi and Wang, Zhijian and Wang, Zhiqian and Wu, Shuang and Wei, Likai and Xiao, Bo and Xie, Wen and Xie, Yan and Yogatama, Dani and Yuan, Bin and Zhan, Jun and Zhu, Zhenyao},
+  booktitle = 	 {Proceedings of The 33rd International Conference on Machine Learning},
+  pages = 	 {173--182},
+  year = 	 {2016},
+  editor = 	 {Balcan, Maria Florina and Weinberger, Kilian Q.},
+  volume = 	 {48},
+  series = 	 {Proceedings of Machine Learning Research},
+  address = 	 {New York, New York, USA},
+  month = 	 {6},
+  publisher =    {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v48/amodei16.pdf},
+  url = 	 {https://proceedings.mlr.press/v48/amodei16.html}
+}
+
+@article{Smaira2020ASN,
+  publtype={informal},
+  author={João Carreira and Eric Noland and Chloe Hillier and Andrew Zisserman},
+  title={A Short Note on the Kinetics-700 Human Action Dataset},
+  year={2019},
+  cdate={1546300800000},
+  journal={CoRR},
+  volume={abs/1907.06987},
+  url={http://arxiv.org/abs/1907.06987}
+}
+
+@inproceedings{pfaff2021learning,
+title={Learning Mesh-Based Simulation with Graph Networks},
+author={Tobias Pfaff and Meire Fortunato and Alvaro Sanchez-Gonzalez and Peter Battaglia},
+booktitle={International Conference on Learning Representations},
+year={2021},
+url={https://openreview.net/forum?id=roNqYL0_XP}
+}
+
+@inproceedings{yin:hal-03137025,
+title={Augmenting Physical Models with Deep Networks for Complex Dynamics Forecasting},
+author={Yuan Yin and Vincent Le Guen and J{\'e}r{\'e}mie Dona and Emmanuel de Bezenac and Ibrahim Ayed and Nicolas Thome and Patrick Gallinari},
+booktitle={International Conference on Learning Representations},
+year={2021},
+url={https://openreview.net/forum?id=kmG8vRXTFv}
+}
+
+@inproceedings{gno,
+title={Neural Operator: Graph Kernel Network for Partial Differential Equations},
+author={Anima Anandkumar and Kamyar Azizzadenesheli and Kaushik Bhattacharya and Nikola Kovachki and Zongyi Li and Burigede Liu and Andrew Stuart},
+booktitle={ICLR 2020 Workshop on Integration of Deep Neural Models and Differential Equations},
+year={2020},
+url={https://openreview.net/forum?id=fg2ZFmXFO3}
+}
+
+@article{Song2021SurrogateMF,
+  title={Surrogate Model for Shallow Water Equations Solvers with Deep Learning},
+  author={Yalan Song and Chaopeng Shen and Xiaofeng Liu},
+  journal={ArXiv},
+  year={2021},
+  volume={abs/2112.10889}
+}
+
+@article{DBLP:journals/corr/abs-2010-02011,
+title = {A physics-informed machine learning approach for solving heat transfer equation in advanced manufacturing and engineering applications},
+journal = {Engineering Applications of Artificial Intelligence},
+volume = {101},
+pages = {104232},
+year = {2021},
+issn = {0952-1976},
+doi = {https://doi.org/10.1016/j.engappai.2021.104232},
+url = {https://www.sciencedirect.com/science/article/pii/S0952197621000798},
+author = {Navid Zobeiry and Keith D. Humfeld}
+}
+
+@article{dubois:hal-02475962,
+title = {Data-driven predictions of the Lorenz system},
+journal = {Physica D: Nonlinear Phenomena},
+volume = {408},
+pages = {132495},
+year = {2020},
+issn = {0167-2789},
+doi = {https://doi.org/10.1016/j.physd.2020.132495},
+url = {https://www.sciencedirect.com/science/article/pii/S0167278919307080},
+author = {Pierre Dubois and Thomas Gomez and Laurent Planckaert and Laurent Perret}
+}
+
+@inproceedings{um2020sol,
+ author = {Um, Kiwon and Brand, Robert and Fei, Yun (Raymond) and Holl, Philipp and Thuerey, Nils},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {H. Larochelle and M. Ranzato and R. Hadsell and M.F. Balcan and H. Lin},
+ pages = {6111--6122},
+ publisher = {Curran Associates, Inc.},
+ title = {Solver-in-the-Loop: Learning from Differentiable Physics to Interact with Iterative PDE-Solvers},
+ url = {https://proceedings.neurips.cc/paper/2020/file/43e4e6a6f341e00671e123714de019a8-Paper.pdf},
+ volume = {33},
+ year = {2020}
+}
+
+@inproceedings{atom3d,
+ author = {Townshend, Raphael and V\"{o}gele, Martin and Suriana, Patricia and Derry, Alex and Powers, Alexander and Laloudakis, Yianni and Balachandar, Sidhika and Jing, Bowen and Anderson, Brandon and Eismann, Stephan and Kondor, Risi and Altman, Russ and Dror, Ron},
+ booktitle = {Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks},
+ editor = {J. Vanschoren and S. Yeung},
+ pages = {},
+ title = {ATOM3D: Tasks on Molecules in Three Dimensions},
+ url = {https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/file/c45147dee729311ef5b5c3003946c48f-Paper-round1.pdf},
+ volume = {1},
+ year = {2021}
+}
+
+@inproceedings{du2021graphgt,
+ author = {Du, Yuanqi and Wang, Shiyu and Guo, Xiaojie and Cao, Hengning and Hu, Shujie and Jiang, Junji and Varala, Aishwarya and Angirekula, Abhinav and Zhao, Liang},
+ booktitle = {Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks},
+ editor = {J. Vanschoren and S. Yeung},
+ pages = {},
+ title = {GraphGT: Machine Learning Datasets for Graph Generation and Transformation},
+ url = {https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/file/32bb90e8976aab5298d5da10fe66f21d-Paper-round2.pdf},
+ volume = {1},
+ year = {2021}
+}
+
+@inproceedings{freitas2021a,
+ author = {Freitas, Scott and Dong, Yuxiao and Neil, Joshua and Chau, Duen Horng},
+ booktitle = {Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks},
+ editor = {J. Vanschoren and S. Yeung},
+ pages = {},
+ title = {A Large-Scale Database for Graph Representation Learning},
+ url = {https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/file/5fd0b37cd7dbbb00f97ba6ce92bf5add-Paper-round1.pdf},
+ volume = {1},
+ year = {2021}
+}
+
+@inproceedings{freeman2021brax,
+ author = {Freeman, Daniel and Frey, Erik and Raichuk, Anton and Girgin, Sertan and Mordatch, Igor and Bachem, Olivier},
+ booktitle = {Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks},
+ editor = {J. Vanschoren and S. Yeung},
+ pages = {},
+ title = {Brax - A Differentiable Physics Engine for Large Scale Rigid Body Simulation},
+ url = {https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/file/d1f491a404d6854880943e5c3cd9ca25-Paper-round1.pdf},
+ volume = {1},
+ year = {2021}
+}
+
+@inproceedings{gilpin2021chaos,
+ author = {Gilpin, William},
+ booktitle = {Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks},
+ editor = {J. Vanschoren and S. Yeung},
+ pages = {},
+ title = {Chaos as an interpretable benchmark for forecasting and data-driven modelling},
+ url = {https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/file/ec5decca5ed3d6b8079e2e7e7bacc9f2-Paper-round2.pdf},
+ volume = {1},
+ year = {2021}
+}
+
+@article{thuerey2020deepFlowPred,
+author = {Thuerey, Nils and Weißenow, Konstantin and Prantl, Lukas and Hu, Xiangyu},
+title = {Deep Learning Methods for Reynolds-Averaged Navier–Stokes Simulations of Airfoil Flows},
+journal = {AIAA Journal},
+volume = {58},
+number = {1},
+pages = {25-36},
+year = {2020},
+doi = {10.2514/1.J058291}
+}
+
+@inproceedings{
+mohan2020embedding,
+title={Embedding Hard Physical Constraints in Convolutional Neural Networks for 3D Turbulence},
+author={Arvind T. Mohan and Nicholas Lubbers and Daniel Livescu and Michael Chertkov},
+booktitle={ICLR 2020 Workshop on Integration of Deep Neural Models and Differential Equations},
+year={2020},
+url={https://openreview.net/forum?id=IaXBtMNFaa}
+}
+
+@inproceedings{
+wandel2021learning,
+title={Learning Incompressible Fluid Dynamics from Scratch - Towards Fast, Differentiable Fluid Models that Generalize},
+author={Nils Wandel and Michael Weinmann and Reinhard Klein},
+booktitle={International Conference on Learning Representations},
+year={2021},
+url={https://openreview.net/forum?id=KUDUoRsEphu}
+}
+
+@inproceedings{10.1145/3392717.3392772,
+ author = {Octavi Obiols-Sales and Abhinav Vishnu and Nicholas Malaya and Aparna Chandramowlishwaran},
+ booktitle = {Proc. ACM International Conference on Supercomputing (ICS)},
+ title = {CFDNet: A deep learning-based accelerator for fluid simulations},
+ year = {2020}
+}
+
+@inproceedings{gupta2021multiwaveletbased,
+ author = {Gupta, Gaurav and Xiao, Xiongye and Bogdan, Paul},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {M. Ranzato and A. Beygelzimer and Y. Dauphin and P.S. Liang and J. Wortman Vaughan},
+ pages = {24048--24062},
+ publisher = {Curran Associates, Inc.},
+ title = {Multiwavelet-based Operator Learning for Differential Equations},
+ url = {https://proceedings.neurips.cc/paper/2021/file/c9e5c2b59d98488fe1070e744041ea0e-Paper.pdf},
+ volume = {34},
+ year = {2021}
+}
+
+@article{DBLP:journals/spm/BronsteinBLSV17,
+  author={Bronstein, Michael M. and Bruna, Joan and LeCun, Yann and Szlam, Arthur and Vandergheynst, Pierre},
+  journal={IEEE Signal Processing Magazine}, 
+  title={Geometric Deep Learning: Going beyond Euclidean data}, 
+  year={2017},
+  volume={34},
+  number={4},
+  pages={18-42},
+  doi={10.1109/MSP.2017.2693418}}
+
+@INPROCEEDINGS{1555942,
+  author={Gori, M. and Monfardini, G. and Scarselli, F.},
+  booktitle={Proceedings. 2005 IEEE International Joint Conference on Neural Networks, 2005.}, 
+  title={A new model for learning in graph domains}, 
+  year={2005},
+  volume={2},
+  number={},
+  pages={729-734 vol. 2},
+  doi={10.1109/IJCNN.2005.1555942}}
+  
+@ARTICLE{4700287,
+  author={Scarselli, Franco and Gori, Marco and Tsoi, Ah Chung and Hagenbuchner, Markus and Monfardini, Gabriele},
+  journal={IEEE Transactions on Neural Networks}, 
+  title={The Graph Neural Network Model}, 
+  year={2009},
+  volume={20},
+  number={1},
+  pages={61-80},
+  doi={10.1109/TNN.2008.2005605}}
+
+@inproceedings{Li2016GatedGS,
+  author    = {Yujia Li and
+               Daniel Tarlow and
+               Marc Brockschmidt and
+               Richard S. Zemel},
+  editor    = {Yoshua Bengio and
+               Yann LeCun},
+  title     = {Gated Graph Sequence Neural Networks},
+  booktitle = {4th International Conference on Learning Representations, {ICLR} 2016,
+               San Juan, Puerto Rico, May 2-4, 2016, Conference Track Proceedings},
+  year      = {2016},
+  url       = {http://arxiv.org/abs/1511.05493},
+  timestamp = {Thu, 25 Jul 2019 14:25:40 +0200},
+  biburl    = {https://dblp.org/rec/journals/corr/LiTBZ15.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@InProceedings{pmlr-v80-sanchez-gonzalez18a,
+  title = 	 {Graph Networks as Learnable Physics Engines for Inference and Control},
+  author =       {Sanchez-Gonzalez, Alvaro and Heess, Nicolas and Springenberg, Jost Tobias and Merel, Josh and Riedmiller, Martin and Hadsell, Raia and Battaglia, Peter},
+  booktitle = 	 {Proceedings of the 35th International Conference on Machine Learning},
+  pages = 	 {4470--4479},
+  year = 	 {2018},
+  editor = 	 {Dy, Jennifer and Krause, Andreas},
+  volume = 	 {80},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {7},
+  publisher =    {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v80/sanchez-gonzalez18a/sanchez-gonzalez18a.pdf},
+  url = 	 {https://proceedings.mlr.press/v80/sanchez-gonzalez18a.html},
+}
+
+@inproceedings{Kipf:2016tc,
+  title={Semi-Supervised Classification with Graph Convolutional Networks},
+  author={Kipf, Thomas N. and Welling, Max},
+  booktitle={International Conference on Learning Representations},
+  year={2017}
+}
+
+@article{
+  velickovic2018graph,
+  title="{Graph Attention Networks}",
+  author={Veli{\v{c}}kovi{\'{c}}, Petar and Cucurull, Guillem and Casanova, Arantxa and Romero, Adriana and Li{\`{o}}, Pietro and Bengio, Yoshua},
+  journal={International Conference on Learning Representations},
+  year={2018},
+  url={https://openreview.net/forum?id=rJXMpikCZ},
+  note={accepted as poster},
+}
+
+@INPROCEEDINGS{qi2016pointnet,  
+    author={Charles, R. Qi and Su, Hao and Kaichun, Mo and Guibas, Leonidas J.},  
+    booktitle={2017 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},   
+    title={PointNet: Deep Learning on Point Sets for 3D Classification and Segmentation},   
+    year={2017},  
+    volume={},  
+    number={},  
+    pages={77-85},  
+    doi={10.1109/CVPR.2017.16}
+}
+
+@inproceedings{
+brandstetter2022geometric,
+title={Geometric and Physical Quantities improve E(3) Equivariant Message Passing},
+author={Johannes Brandstetter and Rob Hesselink and Elise van der Pol and Erik J Bekkers and Max Welling},
+booktitle={International Conference on Learning Representations},
+year={2022},
+url={https://openreview.net/forum?id=_xwr8gOBeV1}
+}
+
+@article{brandstetter2022lie,
+  title={Lie Point Symmetry Data Augmentation for Neural PDE Solvers},
+  author={Brandstetter, Johannes and Welling, Max and Worrall, Daniel E},
+  journal={arXiv preprint arXiv:2202.07643},
+  year={2022}
+}
+
+@misc{fey2019graph,
+  added-at = {2019-03-07T13:50:54.000+0100},
+  author = {Fey, Matthias and Lenssen, Jan Eric},
+  biburl = {https://www.bibsonomy.org/bibtex/2179bc0e62e7cd5540555825398b484a7/bechr7},
+  description = {Fast Graph Representation Learning with PyTorch Geometric},
+  interhash = {47c0a3de9ec59df7c4917676da57b457},
+  intrahash = {179bc0e62e7cd5540555825398b484a7},
+  keywords = {dl graph},
+  note = {cite arxiv:1903.02428},
+  timestamp = {2019-03-07T13:50:54.000+0100},
+  title = {Fast Graph Representation Learning with PyTorch Geometric},
+  url = {http://arxiv.org/abs/1903.02428},
+  year = 2019
 }
 
 
-@ARTICLE{Faulkes2013,
-  title     = "Plasticity and constraints on social evolution in African
-               mole-rats: ultimate and proximate factors",
-  author    = "Faulkes, Chris G and Bennett, Nigel C",
-  journal   = "Philos. Trans. R. Soc. Lond. B Biol. Sci.",
-  publisher = "The Royal Society",
-  volume    =  368,
-  number    =  1618,
-  pages     = "20120347",
-  month     =  may,
-  year      =  2013,
-  language  = "en"
+@incollection{NEURIPS2019_9015,
+title = {PyTorch: An Imperative Style, High-Performance Deep Learning Library},
+author = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and Desmaison, Alban and Kopf, Andreas and Yang, Edward and DeVito, Zachary and Raison, Martin and Tejani, Alykhan and Chilamkurthy, Sasank and Steiner, Benoit and Fang, Lu and Bai, Junjie and Chintala, Soumith},
+booktitle = {Advances in Neural Information Processing Systems 32},
+editor = {H. Wallach and H. Larochelle and A. Beygelzimer and F. d\textquotesingle Alch\'{e}-Buc and E. Fox and R. Garnett},
+pages = {8024--8035},
+year = {2019},
+publisher = {Curran Associates, Inc.},
+url = {http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf}
 }
 
-@ARTICLE{Faulkes2021,
-  title    = "Social evolution in African mole-rats - A comparative overview",
-  author   = "Faulkes, Christopher G and Bennett, Nigel C",
-  journal  = "Adv. Exp. Med. Biol.",
-  volume   =  1319,
-  pages    = "1--33",
-  year     =  2021,
-  language = "en"
+@inproceedings{gsage,
+ author = {Hamilton, Will and Ying, Zhitao and Leskovec, Jure},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {I. Guyon and U. Von Luxburg and S. Bengio and H. Wallach and R. Fergus and S. Vishwanathan and R. Garnett},
+ pages = {},
+ publisher = {Curran Associates, Inc.},
+ title = {Inductive Representation Learning on Large Graphs},
+ url = {https://proceedings.neurips.cc/paper/2017/file/5dd9db5e033da9c6fb5ba83c7a7ebea9-Paper.pdf},
+ volume = {30},
+ year = {2017}
 }
+
+
+@InProceedings{gunet,
+  title = 	 {Graph U-Nets},
+  author =       {Gao, Hongyang and Ji, Shuiwang},
+  booktitle = 	 {Proceedings of the 36th International Conference on Machine Learning},
+  pages = 	 {2083--2092},
+  year = 	 {2019},
+  editor = 	 {Chaudhuri, Kamalika and Salakhutdinov, Ruslan},
+  volume = 	 {97},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {6},
+  publisher =    {PMLR},
+  pdf = 	 {http://proceedings.mlr.press/v97/gao19a/gao19a.pdf},
+  url = 	 {https://proceedings.mlr.press/v97/gao19a.html},
+}
+
+@inproceedings{siren,
+ author = {Sitzmann, Vincent and Martel, Julien and Bergman, Alexander and Lindell, David and Wetzstein, Gordon},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {H. Larochelle and M. Ranzato and R. Hadsell and M.F. Balcan and H. Lin},
+ pages = {7462--7473},
+ publisher = {Curran Associates, Inc.},
+ title = {Implicit Neural Representations with Periodic Activation Functions},
+ url = {https://proceedings.neurips.cc/paper/2020/file/53c04118df112c13a8c34b38343b9c10-Paper.pdf},
+ volume = {33},
+ year = {2020}
+}
+
+@article{bacon,
+author = {Lindell, David B. and Van Veen, Dave and Park, Jeong Joon and Wetzstein, Gordon},
+title = {BACON: Band-limited coordinate networks for multiscale scene representation},
+journal = {arXiv preprint arXiv:0000.00000},
+year={2021}
+}
+
+@article{         numpy,
+ title         = {Array programming with {NumPy}},
+ author        = {Charles R. Harris and K. Jarrod Millman and St{\'{e}}fan J.
+                 van der Walt and Ralf Gommers and Pauli Virtanen and David
+                 Cournapeau and Eric Wieser and Julian Taylor and Sebastian
+                 Berg and Nathaniel J. Smith and Robert Kern and Matti Picus
+                 and Stephan Hoyer and Marten H. van Kerkwijk and Matthew
+                 Brett and Allan Haldane and Jaime Fern{\'{a}}ndez del
+                 R{\'{i}}o and Mark Wiebe and Pearu Peterson and Pierre
+                 G{\'{e}}rard-Marchant and Kevin Sheppard and Tyler Reddy and
+                 Warren Weckesser and Hameer Abbasi and Christoph Gohlke and
+                 Travis E. Oliphant},
+ year          = {2020},
+ month         = {9},
+ journal       = {Nature},
+ volume        = {585},
+ number        = {7825},
+ pages         = {357--362},
+ doi           = {10.1038/s41586-020-2649-2},
+ publisher     = {Springer Science and Business Media {LLC}},
+ url           = {https://doi.org/10.1038/s41586-020-2649-2}
+}
+
+@book{boundary,
+author = {Schlichting, Hermann and Gersten, Klaus},
+year = {2017},
+month = {1},
+pages = {},
+title = {Boundary-Layer Theory},
+publisher = {Springer Berlin Heidelberg},
+isbn = {978-3-662-52917-1},
+doi = {10.1007/978-3-662-52919-5}
+}
+
+
+@article{onecyclelr,
+  author    = {Leslie N. Smith and
+               Nicholay Topin},
+  title     = {Super-Convergence: Very Fast Training of Residual Networks Using Large
+               Learning Rates},
+  journal   = {CoRR},
+  volume    = {abs/1708.07120},
+  year      = {2017},
+  url       = {http://arxiv.org/abs/1708.07120},
+  eprinttype = {arXiv},
+  eprint    = {1708.07120},
+  timestamp = {Mon, 13 Aug 2018 16:48:13 +0200},
+  biburl    = {https://dblp.org/rec/journals/corr/abs-1708-07120.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
+}
+
+@book{surrogate2008,
+  added-at = {2011-03-15T00:00:00.000+0100},
+  author = {Forrester, Alexander I. J. and Sobester, Andras and Keane, Andy J.},
+  isbn = {978-0-470-06068-1},
+  keywords = {dblp},
+  pages = {I-XVIII, 1-210},
+  publisher = {Wiley},
+  timestamp = {2011-04-29T15:26:06.000+0200},
+  title = {Engineering Design via Surrogate Modelling - A Practical Guide.},
+  year = 2008
+}
+
+@book{surrogate2020,
+author = {Jiang, Ping and Zhou, Qi and Shao, Xinyu},
+year = {2020},
+month = {1},
+pages = {},
+title = {Surrogate Model-Based Engineering Design and Optimization},
+isbn = {978-981-15-0730-4},
+doi = {10.1007/978-981-15-0731-1},
+publisher = {Springer Tracts in Mechanical Engineering (STME)}
+}
+
+@article{tfnet,
+   title={Towards Physics-informed Deep Learning for Turbulent Flow Prediction},
+   author={Rui Wang and Karthik Kashinath and Mustafa Mustafa and Adrian Albert and Rose Yu},
+   journal={Proceedings of the 26th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+   Year = {2020}
+}	

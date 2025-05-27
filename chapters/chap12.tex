@@ -1,126 +1,287 @@
 \chapter{AirfRANS Dataset} % Main chapter title
 
+Surrogate models are necessary to optimize meaningful quantities in physical dynamics as their recursive numerical resolutions are often prohibitively expensive. It is mainly the case for fluid dynamics and the resolution of Navier–Stokes equations. However, despite the fast-growing field of data-driven models for physical systems, reference datasets representing real-world phenomena are lacking. In this work, we develop \textsc{AirfRANS}, a dataset for studying the two-dimensional incompressible steady-state Reynolds-Averaged Navier–Stokes equations over airfoils at a subsonic regime and for different angles of attacks. We also introduce metrics on the stress forces at the surface of geometries and visualization of boundary layers to assess the capabilities of models to accurately predict the meaningful information of the problem. Finally, we propose deep learning baselines on four machine learning tasks to study \textsc{AirfRANS} under different constraints for generalization considerations: big and scarce data regime, Reynolds number, and angle of attack extrapolation.
 
-%----------------------------------------------------------------------------------------
-%	SECTION 
-%----------------------------------------------------------------------------------------
-\section{Titre de la section}
-%-----------%-----------
-%	SOUS-SECTION 
-%-----------%-----------
-\subsection{Titre de la sous-section}
+\section{Introduction}
+Numerical simulations of physical dynamics are a consequent part of scientific research as it allows us to quantitatively study natural phenomena without requiring often complex and expensive experiments. Those dynamics are mainly governed by Partial Differential Equations (PDE) and are numerically solved with the help of discretization methods such as finite differences, finite elements, or finite volumes methods. Such techniques are accurate when used over sufficiently fine meshes but are often expensive in time and resources. Thus, the optimization of meaningful quantities with respect to the parameters of the studied dynamics is, most of the time, out of scope. In particular, the numerical resolution of Navier–Stokes equations for fluid dynamics analysis leads to computations that can last for thousands of CPU hours. Hence, the design of accurate surrogate models is at the core of engineering as they allow us to tackle the task of optimization via data-driven approaches. However, to be able to compare and validate such surrogate models we need datasets of reference and evaluation protocols. For physical systems, some efforts have already been done in this direction \cite{otness2021an,bonnet2022an} and our work is another contribution to those efforts. In \cite{bonnet2022an}, we developed the first version of this dataset to study Reynolds-Averaged Navier–Stokes (RANS) equations with Machine Learning (ML) models along with an appropriate evaluation protocol. In this paper, we propose an extension of this work by introducing a new high-fidelity version of the dataset. This high-fidelity version is built over finer meshes than the previous one which helps to fight numerical diffusion and allows us to recover more accurate fields and the trail of airfoils. Moreover, it allows us to accurately compute the force coefficients acting over geometries.
 
-%-----------
-%	SOUS-SOUS-SECTION 
-%------------
-\subsubsection{Titre de la sous-sous-section}
-%-----------
-%	SOUS-SOUS-SECTION 
-%------------
-\subsubsection{Titre de la sous-sous-section}
+We focus on the classical aerodynamics task of predicting the steady-state two-dimensional fields and the force acting over airfoils in a subsonic regime. The ultimate goal of this task is to be able to find the best airfoil in terms of lift over drag ratio (see chapter 1 of \cite{aero}) in addition to the associated velocity and pressure fields. It is already a non-trivial problem in Computational Fluid Dynamics (CFD) as turbulence is involved and mesh engineering is required to find accurate force coefficients. To accelerate the resolution process, different ML frameworks can be used to build surrogate models \cite{surrogate2020, surrogate2008}. Deep Learning (DL) is among the successful candidates and has recently gained popularity for fluid simulation \cite{thuerey2020deepFlowPred}. Moreover, the emerging field of Geometric Deep Learning (GDL) \cite{DBLP:journals/spm/BronsteinBLSV17} models allows us to achieve learning directly on unstructured data \cite{pfaff2021learning} which, in this particular case, allows us to compute accurately meaningful quantities at the surface of geometries.
 
+In this work, we present a high fidelity aerodynamics dataset of RANS solutions around airfoils. In Section~\ref{sec:dataset} we present the RANS equations, the chosen design space for the airfoils generation, the meshes construction, and the dataset generation procedure. We also present the two force coefficients of interest, namely the drag and the lift coefficients. In Section~\ref{sec:setup} we introduce the different sub-tasks of the problem in addition to the evaluation protocol and the setup for our GDL baselines. In particular, the evaluation protocol contains metrics and visualizations for the force coefficient ranks and the accuracy of the surrogate models over boundary layers. We finally present, in Section~\ref{sec:results} the results of our baselines on the main sub-task and let the remaining ones in Appendix~\ref{ap:results}. All the values of the constant used in this work and the definition of dimensionless quantities are given in Appendix~\ref{ap:dimensionless}.
 
-%-----------%-----------
-%	SOUS-SECTION 
-%-----------%-----------
-\subsection{Titre de la sous-section}
+\section{Related Work}\label{sec:related_works}
+Although several research directions are established to come up with efficient surrogate models to tackle physics problems, from physically guided methods \cite{de2018deep,Chen2020,dgm,pmlr-v80-long18a,brandstetter2022lie} to neural operators \cite{mgno,Kovachki2021NeuralOL,fno,lu2021learning} and Physics Informed Neural Networks (PINN) \cite{pinns}, the lack of standard benchmarking datasets, and common evaluation protocols impede making rigorous comparisons between the different families of methods for a given task. Benchmarking datasets and common evaluation protocols are shown to be the key components for making progress as it is observed in neighboring fields such as, for example, computer vision \cite{imagenet,Smaira2020ASN} and speech recognition \cite{pmlr-v48-amodei16}. Though, few physics-based datasets have been proposed  such as: 1D Burger’s equation and  2D Darcy flow PDE \cite{mgno}, structural mechanics \cite{pfaff2021learning}, incompressible fluid in vorticity form \cite{fno}, reaction-diffusion, wave-equations and damped pendulum \cite{yin:hal-03137025}, heat transfer equation \cite{DBLP:journals/corr/abs-2010-02011}, Lorenz system \cite{dubois:hal-02475962}. More recently, few standard benchmarks datasets on complex chemical and physical systems \cite{atom3d,du2021graphgt,freitas2021a,freeman2021brax,gilpin2021chaos} have been proposed. More interestingly, \cite{otness2021an} suggests a framework to study a set of representative physics problems with appropriate evaluation protocols, namely a single oscillating spring, a one-dimensional linear wave equation, a Navier–Stokes flow problem, as well as a mesh of damped springs. We follow those efforts by proposing a dataset on a steady-state aerodynamics task with dynamics that can be found in realistic flight scenarios. We also focus the validation of models on meaningful parts of the dynamic instead of only regarding the mean square loss of regressed fields. 
 
-%-----------
-%	SOUS-SOUS-SECTION 
-%------------
-\subsubsection{Titre de la sous-sous-section}
+Most of the works proposed in the literature to tackle tasks represented by Navier–Stokes equations are grid-based approaches \cite{um2020sol,thuerey2020deepFlowPred,mohan2020embedding,wandel2021learning,10.1145/3392717.3392772,gupta2021multiwaveletbased, tfnet} which rely on Convolutional Neural Networks (CNN). Other architectures such as Fourier Neural Operator \cite{fno} act in the frequency domain and require a regular grid to perform a Fast Fourier Transform of the input data. Those models are not designed to directly operate on unstructured data like CFD meshes, resulting in inaccurate predictions of the physical fields at the surface of geometries. However, recent progress in learning on unstructured data \cite{DBLP:journals/spm/BronsteinBLSV17} has enabled learning on graphs and manifolds by designing geometrical inductive bias in DL \cite{1555942,4700287,Li2016GatedGS,Kipf:2016tc,pmlr-v80-sanchez-gonzalez18a}. This framework is particularly useful to achieve learning on arbitrary shapes and frees us from the constraint of data voxelization as required by CNN. One successful attempt at learning Navier–Stokes (or RANS) equations with Graph Neural Networks (GNN) can be found in \cite{pfaff2021learning}. Finally, let us emphasize that PINN, as defined in \cite{pinns} can act on unstructured data but are not suited for surrogate modeling as they are designed to solve one and only one PDE.
 
-%-----------
-%	SOUS-SOUS-SECTION 
-%------------
-\subsubsection{Titre de la sous-sous-section}
+\section{Dataset Presentation} \label{sec:dataset}
+\paragraph{Design-oriented dataset.} This dataset is mainly motivated by a realistic shape optimization problem. We choose a classical aerodynamics problem for this purpose: airfoil design optimization. The goal is to accurately predict force coefficients in addition to the different fields of the fluid in a subsonic flight regime with a reduced quantity of data as is often the case in practice. The design space is chosen from NASA's early works on airfoils via the 4 and 5 digits series \cite{naca} as they are easy to handle and already rich families of shapes.
 
-%-----------%-----------
-%	SOUS-SECTION 
-%-----------%-----------
-\subsection{Titre de la sous-section}
+We aim to resolve the air dynamic around a two-dimensional (2D) airfoil in a steady-state subsonic regime at sea level and \SI{298.15}{\kelvin}. More precisely, we study airflows at a Reynolds number between 2 and 6 million, which leads to turbulent behavior of the fluid. It corresponds to a Mach number smaller than 0.3 which allows us to assume incompressible flow behavior (see chapter 8 of \cite{aero}), and a velocity greater than \SI{30}{\meter\per\second} which is a reasonable lower bound in subsonic flight conditions. Moreover, as the flow is turbulent in certain areas, we use Reynolds-Averaged-Simulations (RAS) with a sufficiently high number of cells in our meshes to accurately compute the force acting over airfoils. This method solves the RANS equations widely used in Computational Fluid Dynamics (CFD) to control the numerical complexity of the resolutions.
 
+We rely on the Turbulence Modeling Resource (TMR) of the Langley Research Center of the National Aeronautics and Space Administration (NASA) \cite{TMR, NACA0012-1, NACA0012-2, NACA4412} to generate our dataset. In what follows, we present the different steps to build the dataset, and we define the relevant physical quantities of the problem.
 
-%----------------------------------------------------------------------------------------
-%	SECTION 
-%----------------------------------------------------------------------------------------
+\paragraph{Reynolds-Averaged Navier–Stokes equations.} At a high Reynolds number, untidy patterns emerge in fluid flows; we call this phenomenon turbulence. In CFD, turbulence resolution is a crucial problem as it implies transient simulations on prohibitively fine meshes most of the time. Different strategies have been developed to tackle this problem, one of them being RAS. In RAS, we solve mean-field equations similar to Navier–Stokes equations but with an effective viscosity representing the diffusion added through turbulent processes. Those equations, called incompressible RANS equations, are given by:
+\begin{align}
+	\partial_i \Bar{u}_i &= 0 \\
+	\partial_j(\Bar{u}_i\Bar{u}_j) &= -\partial_i\left(\frac{\Bar{p}}{\rho}\right) + (\nu + \nu_t)\partial^2_{jj}\Bar{u}_i, \quad i\in\{1,2\}
+\end{align}
+where $\Bar{\cdot}$ denotes an ensemble-averaged quantity, $\partial_i$ the partial derivative with respect to the $i^{th}$ spatial components, $u$ the fluid velocity, $p$ an effective pressure, $\rho$ the fluid specific mass, $\nu$ the fluid kinematic viscosity, $\nu_t$ the fluid kinematic turbulent viscosity and where we used the Einstein summation convention over repeated indices. Often, in the incompressible case, the effective pressure is replaced by the reduced pressure, abusively denoted by the same symbol via the transformation $p \rightarrow p/\rho$, which allows us to write RANS equations without explicit dependence on $\rho$. From now on, we will only discuss in terms of the reduced pressure. Finally, the dynamics of the turbulent viscosity is driven by a set of supplementary equations. In this work, we choose to use the well-known $k-\omega$ SST turbulence model \cite{SST} which is well suited for aerodynamics problems. Details on the RANS equations, the definition of the different quantities, the ensemble average, and the choice of the turbulent model are given in Appendix~\ref{ap:RANS}.
 
+\paragraph{Airfoil design space.} In the first half of the twentieth century, teams of the National Advisory Committee for Aeronautics (NACA) worked on several airfoil families. Two of them called the 4 and 5 digits series, are entirely parameterized and allow us to generate a broad spectrum of airfoils quickly. Both series define a camber line and an envelope around this camber line. An airfoil of the 4 digits one is defined by a sequence MPXX where M is the maximum ordinate of the camber line in hundredth of chords\footnote{One chord is the characteristic length of the airfoil, in our case \SI{1}{\meter}}, P is the position of this maximum from the leading edge in tenth of chords and XX the maximum thickness in hundredth of chords. For the 5 digits series, each airfoil is defined by a sequence LPQXX. Digits L and P define in a more sophisticated manner than the 4 digits sequence the maximum camber of the camber line, Q is a boolean that switches between a single-cambered airfoil and a double-cambered one which allows in the latter case to achieve a theoretical pitching moment of 0. The last two digits XX have the same definition as in the 4 digits case. 
 
-%-----------------------------------
-%	SECTION 
-%-----------------------------------
-\section{Titre de la section}
+Each simulation is first defined by an airfoil drawn in the 4 and 5 digits series families. The sampling strategy in those two series is given in Table~\ref{tab:sample-NACA}. In our previous work \cite{bonnet2022an}, we chose to use the UIUC Airfoil Database \cite{UIUC} to build the dataset but we decide here to restrict our airfoil design space to the NACA 4 and 5 digits series. Those series are already rich families of airfoils that have been widely used historically and they are easier to handle for the automation of the mesh generation due to their explicit parametrization. Moreover, in the 4 digits series, we choose to sample the parameter P between 0 and 7 and to set the drawn parameters in the interval $(0, 1.5]$ to 0. We motivate this choice as airfoils with P in the range $(0, 1.5]$ have their maximum camber close to the trailing edge which can lead to unusable airfoils.
 
-\cite{Ruppell1842}
+Examples of different airfoils, details on the generation of such airfoils, and empirical statistics of the drawn parameters are given in Appendix~\ref{ap:airfoil}.
 
-
-%-----------------------------------
-%	SECTION 
-%-----------------------------------
-
-\section{Titre de la section}
-
-\begin{table}[ht]%[!ht]%[tb]
-\footnotesize
-    \caption{Titre de la table.}
-    \begin{tabularx}{1\textwidth}{
-     >{\raggedright\arraybackslash}X 
-     >{\raggedright\arraybackslash}X 
-     >{\raggedright\arraybackslash}X  }  \hline \hline
-        \textbf{ }                      & \textbf{Souris}                       & \textbf{Humain} \\ \hline
-        \textbf{Cycle pilaire}          & $\approx$ \num{3} semaines            & Variable: région-dépendant \\ 
-        \textbf{Pilosité et densité}   & Élevées : \num{1000}/\unit{\square\milli\metre}                  & Faibles : \num{25}/\unit{\square\milli\metre} \\ 
-        \textbf{Épaisseur épidermique}  & Fine, \num{2}-\num{5} couches, \SI{10}{\micro\metre}           & Épaisse, $>$\num{10} couches, \num{60}-\SI{90}{\micro\metre}  \\ 
-        \textbf{Papilles dermiques}     & Absence                               & Présence \\ 
-        \textbf{Pigmentation}           & Follicule pilleux                     & Épiderme interfolliculaire \\ 
-        \textbf{Renouvellement EIF} & \num{8}-\num{10} jours                         & \num{28}-\num{39} jours \\ 
-        \textbf{Épaisseur dermique}     & Plus fine                              & Plus épaisse \\ 
-        \textbf{Glandes sudorales apocrines} & Absence dans la peau             & Présence dans les régions cutanées axillaires, inguinales et périanales \\ 
-        \textbf{Propriétés biomécaniques } & Mince, souple, lâche               & Épaisse, relativement rigide, adhérante aux tissus sous-jacents. \\ 
-        \textbf{Épaisseur de l'hypoderme} & Dépendante du cycle pillaire         & Peu variable  \\ 
-        \textbf{Couche musculaire sous-cutanée} & présence du \textit{panniculus carnosus}  & Présence uniquement dans la région du cou (platysma) \\
-        \textbf{Principale méthode de cicatrisation} & Contraction              & Formation de tissu de granulation et réépithélialisation \\ 
-        \textbf{Nombre de couches}      & \num{3}                                     & \num{3} \\ 
-        \textbf{Lymphocytes T (EIF)}          & DETC                  & a/b T cells \\ \hline \hline
-    \end{tabularx}
-    \label{table:diff-souris-hum}
+\begin{table}
+	\caption{Sampling strategy for generating airfoils from the 4 and 5 digits series. An interval or a discrete set means that the sampling is uniform over this set. In the 4 digits case, the sampling for P has been a uniform sampling on the interval $[0, 7]$, and all the samples smaller than 1.5 have been set to 0 to get rid of geometries that have their maximum camber too close from the leading edge.}
+	\label{tab:sample-NACA}
+	\centering
+	\begin{tabular}{ccc}
+		\toprule
+		\multicolumn{3}{c}{4-digits}                  \\
+		\midrule
+		M & P & XX \\
+		\midrule
+		$[0, 7]$ & $\{0\}\bigcup [1.5, 7]$ & $[5, 20]$      \\
+		\bottomrule
+	\end{tabular} \hspace{1cm}
+	\begin{tabular}{cccc}
+		\toprule
+		\multicolumn{4}{c}{5-digits}                    \\
+		\midrule
+		L & P & Q & XX \\
+		\midrule
+		$[0, 4]$ & $[3, 8]$ & $\{0, 1\}$ & $[5, 20]$      \\
+		\bottomrule
+	\end{tabular}
 \end{table}
 
-\lipsum[70]
+\paragraph{Mesh generation.} As airfoils are pretty simple geometries, we use the multi-block hexahedral mesh generator \emph{blockMesh} from OpenFOAM v2112 \cite{OpenFOAM} to mesh our shapes. We build a C-Grid mesh for each airfoil, mimicking the mesh developed by NASA for the NACA 0012 and 4412 cases \cite{TMR}. Boundaries are at 200 chords of the airfoil to reduce the impact of boundary conditions on simulations. In Figure~\ref{fig:mesh_scheme}, we show the different block definitions with an example of a ready-to-use mesh and a final mesh on a classical airfoil. As we aim for accuracy in the computation of the global forces over the airfoil surface, such as the wall shear stresses, we mesh the boundary layer such that the first cells of the surface are of height \SI{2}{\micro\meter} leading to a $y^{+}$ of around 1 in the worst case of our design space. This leads to meshes from \SI{250000}{} to \SI{300000}{} cells. All the technical details and definitions of the meshing procedure are given in Appendix~\ref{ap:meshing}.
 
-\lipsum[70]
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.49\textwidth}
+		\centering
+		\includegraphics[width = \linewidth]{Dataset/mesh_scheme.pdf}
+		\caption{}
+	\end{subfigure}
+	\begin{subfigure}{0.49\textwidth}
+		\centering
+		\includegraphics[width = \linewidth]{Dataset/mesh_0012_10_far.png}
+		\caption{}
+	\end{subfigure}
+	\caption{Example of mesh for the NACA 0012 at an angle of attack of \SI{10}{\degree}. (a) Scheme of the multi-block mesh. Point number 1 moves following the angle of attack; all other points are fixed. The contour in red (airfoil) and green (freestream) are the domain's boundaries. (b) The entire domain of a ready-to-use mesh.}
+	\label{fig:mesh_scheme}
+\end{figure}
 
-\lipsum[70]
+\paragraph{Dataset generation.} For the generation of the dataset, we run \SI{1000}{} simulations, each defined by an airfoil, a Reynolds number, and an angle of attack. We choose to only run \SI{1000}{} simulations as one of the goals of this dataset is to be close to real-world settings, \emph{i.e.} limited quantity of data. The airfoil is sampled from the distribution given in Table~\ref{tab:sample-NACA}. We motivate the design space of the initial conditions to reproduce the panel of flight conditions encountered in subsonic flights. We stop at a Mach number of 0.3 (Reynolds number of roughly 6 million) to keep the incompressible assumption valid and we start at a Reynolds number of 2 million as it is a correct lower bound of flight velocity (around 60 knots). The lower bound for angles of attack, \SI{-5}{\degree}, is chosen such as cambered airfoils have a lift coefficient of roughly 0 and the upper bound, \SI{15}{\degree}, is chosen to prevent stall and unsteady patterns in the trail of airfoils. Those ranges are tighter than the one chosen in our previous work \cite{bonnet2022an} but better represent the classical ranges of velocity and angle of attack encountered in subsonic flight conditions. We then run the simulations with the help of the steady-state RANS solver \emph{simpleFOAM} via the SIMPLEC algorithm \cite{SIMPLE, SIMPLEC} and with the $k-\omega$ SST turbulence model \cite{SST} until convergence of drag and lift coefficients. Simulations are done on 16 CPU cores of an AMD Ryzen™ Threadripper™ 3960X. Figure~\ref{fig:NACA_field} shows a near view of the pressure and $x$-component of the velocity fields. Boundary conditions types and values for each simulation are given in Appendix~\ref{ap:boundary}.
 
-\lipsum[70]
+\begin{figure}
+	\centering
+	\begin{subfigure}{0.49\textwidth}
+		\centering
+		\includegraphics[width = \linewidth]{Dataset/near_p.png}
+	\end{subfigure}
+	\begin{subfigure}{0.49\textwidth}
+		\centering
+		\includegraphics[width = \linewidth]{Dataset/near_ux.png}
+	\end{subfigure}
+	\caption{Example of a pressure (left) and $x$-component of the velocity (right) fields around a NACA (2.123, 3.832, 1, 9.902) at a velocity of \SI{54.238}{\meter\per\second} and at an angle of attack of \SI{7.911}{\degree}.}
+	\label{fig:NACA_field}
+\end{figure}
 
-\lipsum[70]
+\paragraph{Force coefficients.} One of the important quantities when simulating the fluid flow around a geometry is the force acting on it (see chapter 4 of \cite{aero}). This force is made by the contribution of the pressure and the viscous stresses at the surface of the geometry (called wall shear stress). The force component collinear to the free-stream velocity is called the drag $D$, and the one orthogonal to the free-stream velocity is the lift $L$. If divided by $q_\infty := \rho U_\infty^2 A/2$, where $\rho$ is the fluid specific mass, $U_\infty$ the inlet velocity and $A$ the characteristic area of the geometry (in our case we take the chord as the 1D surface characteristic "area", \emph{i.e.} $A = \SI{1}{\square\meter}$), those components give the dimensionless drag coefficient $C_D := D/q_\infty$ and lift coefficient $C_L := L/q_\infty$. Other quantities such as the pitching moment can also be computed with force acting on the body, but we will only focus on the drag and lift coefficients in this work. To compute the wall shear stress, we need to compute the velocity gradient at the surface of the airfoil. We compute it discretely with the help of the \emph{gradient filter} in ParaView \cite{paraview} over the mesh.
 
-\lipsum[70]
+\section{Benchmarking Setup}\label{sec:setup}
+The machine learning task consists in predicting the different spatial fields such as the mean-field velocity and reduced pressure $\Bar{u}$ and $\Bar{p}$ and the force acting over airfoils. The turbulent viscosity $\nu_t$ is not mandatory in the regression task as we do not need it to compute the force over an airfoil\footnote{the boundary condition of the turbulent viscosity on the airfoil is 0 in our case}. Still, it can give insights into the local intensity of turbulence in the volume. Regarding the force coefficients, and more precisely, the drag and lift coefficients, from a design process standpoint, we are more interested in the rank correlation with the true values than with the Mean Squared Error (MSE). Indeed, if the rank of the coefficients is accurately approximated, the optimization process will lead to the same airfoil. We can also add linear correlation plots for qualitative prediction information. Moreover, we are dealing in this dataset with hexahedral meshes with more than \SI{250,000}{} cells which represent roughly the same number of nodes. These are already big meshes for 2D simulations but it is nothing compared to 3D cases where the number of cells can be of tens of million. To train a model on such simulations, we need to find a way to reduce the numerical complexity of the problem. Cropping close to the geometry is one way to do so, but as most cells lie in the vicinity of the geometry, it is not sufficient. Also, as we want to infer the force acting over the airfoil accurately, we cannot treat the cropped simulation as an image and work on a sub-sampled regular grid.
 
-\lipsum[70]
+In this work, we choose the strategy which consists of regressing the four fields $\Bar{u}_x$, $\Bar{u}_y$, $\Bar{p}$ and $\nu_t$ and compute the wall shear stress and the associated forces as post-processing to follow the form of RANS equations. We present a method to take into account the remarks mentioned above. Finally, we use the 1000 simulations to build four different setups:
+\begin{itemize}
+	\item \emph{Full data regime:} 800 samples for the training set and 200 for the test set
+	\item \emph{Scarce data regime:} 200 samples for the training set and the same test set as in the full data regime
+	\item \emph{Reynolds extrapolation:} the training set is composed of the samples with a Reynolds of three to five million, and the test set is formed by the samples with a Reynolds of two to three and five to six million
+	\item \emph{Angle of attack extrapolation:} the training set is composed by the samples with an angle of attack between \SI{-2.5}{\degree} and \SI{12.5}{\degree} and the test set is composed by the samples with an angle of attack from \SI{-5}{\degree} to \SI{-2.5}{\degree} and \SI{12.5}{\degree} to \SI{15}{\degree}.
+\end{itemize}
 
-\lipsum[70]
+\paragraph{Preprocessing.} As we do not need the far-field to get rid of the boundary conditions impact on the simulation as in CFD, we crop all the simulations to a rectangle of size $[-2, 4]\times[-1.5, 1.5]$ meters. It allows us to limit our point clouds' size and make the network focus on the interesting part of the simulations. Moreover, data normalization is important in DL to make the optimization process easier or feasible. We use normalization with the means and the standard deviations of the training set field components.
 
-\lipsum[70]
+\paragraph{Loss, sampling, and graph construction.} At the end of the cropping procedure, we still have to deal with roughly \SI{150,000}{} cells in each simulation giving about the same number of nodes. To train a model on such simulations, we need to find a way to reduce the numerical complexity even more. 
 
-\lipsum[70]
+To handle this numerical complexity, at each epoch, we choose to sample uniformly on the cropped mesh \SI{32.000}{} nodes and, when necessary, reconstruct a radius graph of radii \SI{5}{\centi\meter} with a maximum number of neighbors of 64\footnote{which means that we connect nodes only very locally compared to the characteristic length of \SI{1}{\meter} of airfoils}. This approach has several advantages, it allows us to directly control the numerical complexity with the number of sub-sampled nodes, the radii of the graph, and the maximum number of neighbors inside it. Moreover, during the inference, it is straightforward to infer fields on each node of the initial mesh by making multiple forward passes with different sub-sampling until every node has been seen and averaging the outputs on the nodes that have been seen multiple times. It allows us to compute the velocity gradient on the airfoil with the help of the initial mesh and ParaView's pythonic interface PyVista \cite{pyvista} to be able to compare with the surface force targets. However, one downside effect of the method is that the mesh densities bias the learning procedure, and the learned models may not generalize well to different types of meshes. In this dataset, we are not facing this problem as all the meshes are generated via the same procedure. Additionally, we can not sample independently on the airfoil and on the volume to bias models to be more accurate on the airfoil as the force highly depends on the pressure field at the surface. 
+Finally, The loss $\mathcal{L}$ used in this work is the sum of two terms, a loss over the volume $\mathcal{L}_{\mathcal{V}}$ and a loss over the surface $\mathcal{L}_{\mathcal{S}}$:
+\begin{equation}\label{eq:global_loss}
+	\centering
+	\mathcal{L}:={\underbrace{\frac{1}{|\mathcal{V}|}\sum_{i\in \mathcal{V}} \|f_\theta(x_i) - y_i\|_2^2}_{\text{$\mathcal{L}_\mathcal{V}$}}}+  \lambda{\underbrace{\frac{1}{|\mathcal{S}|}\sum_{i\in \mathcal{S}} \|f_\theta(x_i) - y_i\|_2^2}_{\text{$\mathcal{L}_\mathcal{S}$}}}
+\end{equation}
+where $\mathcal{V}$, $\mathcal{S}$ are respectively the set of the indices of the nodes that lie in the volume and on the airfoil, $x_i \in \mathbb{R}^{7}$ is the input at node $i$ containing the spatial coordinates, the inlet velocity, the Euclidean distance function between the node and the airfoil, and the unit surface outward-pointing normal for points on the airfoil (filled with zeroes otherwise). The targets $y_i \in \mathbb{R}^{4}$ at node $i$ contain the velocity, the pressure, and the turbulent kinematic viscosity at this node. And $f_\theta$ represents the model used. The coefficient $\lambda$ is used to balance the weight of the error at the surface of the geometry and over the volume\footnote{In this work $\lambda$ is set to 1.}. We have to emphasize that this loss is not necessarily a good proxy when it comes, for instance, to infer the wall shear stress accurately or ensuring that the inferred fields satisfy the RANS equations.
 
-\lipsum[70]
+\paragraph{Metrics and visualizations.} One of the challenges of this dataset is to build models that manage to predict the form of the boundary layer accurately. To evaluate the performance of the models, we define qualitative and quantitative metrics.
 
-\lipsum[70]
+To qualitatively check this accuracy, we propose to plot the components of the velocity and the turbulent viscosity (if regressed) in the boundary layer of airfoils at different chord lengths. Also, we propose to check the accuracy of the prediction for the pressure and skin friction coefficients on the airfoil as they carry important information on the wing's behavior in flight conditions. Finally, we propose to plot the predicted force coefficients with respect to the true coefficients which gives us qualitative information about the correlation between both variables. 
 
-\lipsum[70]
+In terms of quantitative metrics, we use the MSE for each field on the volume and over the airfoil to measure the accuracy of our models. Moreover, we compute the mean and standard deviation of the relative error on the drag and lift coefficients. Finally, we compute Spearman's rank correlation coefficient between the true and predicted force coefficients. From a design process point of view, the last coefficient is the most crucial quantity to maximize as it quantifies the monotonic correlation between the true and predicted force coefficients. If this coefficient is close to 1, we can expect our model to be able to find the best airfoil maximizing or minimizing the chosen force coefficient even if the inferred value is not close to the true value.
 
-\lipsum[70]
+\section{Benchmarking Results}\label{sec:results}
+To propose baselines for the problem, we train three standard GDL models and a Multi-Layer Perceptron (MLP) in the full data regime. The associated results for the three other tasks are given in Appendix~\ref{ap:results}. Each model is preceded by an encoder and followed by a decoder, both defined by a MLP and trained together with the model. We follow the setup defined in the previous section for the training and testing procedures. Each model is trained 5 times to compute a mean and a standard deviation for the different metrics. For each metric, we bold the best-performing method. We choose as baselines a GraphSAGE \cite{gsage}, a PointNet \cite{qi2016pointnet}, a Graph U-Net \cite{gunet} and a MLP. Those baselines have been chosen as they access different types of information. The MLP only has access to the features of the nodes, the GraphSAGE has in addition access to local neighborhood information, the PointNet conditioned a deep MLP with global features, and the Graph U-Net access from local to global neighborhood information via its multi-scale architecture. Models are trained in the same conditions and the details of architectures and hyperparameters can be found in Appendix~\ref{ap:models}.
 
-\lipsum[70]
+In Table~\ref{tab:MSE}, we give the MSE over the volume and at the surface of airfoils for the different regressed fields. In Table~\ref{tab:spear} we give the mean relative errors on the force coefficient and the Spearman's rank correlation coefficient. In Table~\ref{tab:time} we compare the computational time to run a simulation, train a model and infer on a new example. In Figure~\ref{fig:coefs} we plot the predicted force coefficients with respect to the true coefficients. Plots of the velocity and turbulent viscosity profiles in the boundary layer and surface coefficients for randomly chosen test geometries are given in Appendix~\ref{ap:results}. 
 
-\lipsum[70]
+The Graph U-Net model significantly outperforms other models for the pressure at the surface, this correlates with its performance on the relative error and Spearman's correlation for the lift coefficient. However, it struggles to learn the velocity field compared to local models such as GraphSAGE and MLP. The GraphSAGE model seems to be a good trade-off, in this setting, between complexity and performance as it achieves almost equivalent performance with the Graph U-Net, is almost twenty times faster to call, and has half of the number of parameters of the Graph U-Net.
 
-\lipsum[70]
+\begin{table}
+	\caption{Mean squared error on the different normalized fields for a MLP and standard GDL baselines on the full data regime test set. Only the reduced pressure is given on the surface as the other quantities are null via the boundary conditions. Those quantities are directly regressed by the models.}
+	\label{tab:MSE}
+	\centering
+	\begin{tabular}{cccccc}
+		\toprule
+		Model & \multicolumn{4}{c}{Volume} & Surface  \\
+		& $\Bar{u}_x$ ($\times 10^{-2}$) & $\Bar{u}_y$ ($\times 10^{-2}$) & $\Bar{p}$ ($\times 10^{-2}$) & $\nu_t$ ($\times 10^{-2}$) & $\Bar{p}$ ($\times 10^{-1}$) \\
+		\midrule
+		MLP & 0.95 $\pm$ 0.06 & \textbf{0.98 $\pm$ 0.17} & 0.74 $\pm$ 0.13 & 1.90 $\pm$ 0.10 & 1.13 $\pm$ 0.14 \\
+		GraphSAGE & \textbf{0.83 $\pm$ 0.01} & 0.99 $\pm$ 0.05 & \textbf{0.66 $\pm$ 0.05} & 1.60 $\pm$ 0.21 & 0.66 $\pm$ 0.10 \\
+		PointNet & 3.50 $\pm$ 1.04 & 3.64 $\pm$ 1.26 & 1.15 $\pm$ 0.23 & 2.92 $\pm$ 0.48 & 0.93 $\pm$ 0.26 \\
+		Graph U-Net & 1.52 $\pm$ 0.34 & 2.03 $\pm$ 0.39 & 0.66 $\pm$ 0.08 & \textbf{1.46 $\pm$ 0.14} & \textbf{0.39 $\pm$ 0.07} \\
+		\bottomrule
+	\end{tabular}
+\end{table}
 
-\lipsum[70]
+\begin{table}
+	\caption{Relative errors (Spearman's rank correlation) for the predicted drag coefficient $C_D$ ($\rho_D$) and lift coefficient $C_L$ ($\rho_L$). We want Spearman's correlation to be close to one. Those quantities are computed as a post-processing from the unnormalized regressed fields.}
+	\label{tab:spear}
+	\centering
+	\begin{tabular}{ccccccc}
+		\toprule
+		Model & \multicolumn{2}{c}{Relative error} & \multicolumn{2}{c}{Spearman's correlation}  \\
+		& $C_D$ & $C_L$ & $\rho_D$ & $\rho_L$ \\
+		\midrule
+		MLP & 4.289 $\pm$ 0.679 & 0.767 $\pm$ 0.108 & -0.117 $\pm$ 0.256 & 0.913 $\pm$ 0.018 \\
+		GraphSAGE & \textbf{4.050 $\pm$ 0.704} & 0.517 $\pm$ 0.162 & -0.303 $\pm$ 0.124 & 0.965 $\pm$ 0.011 \\
+		PointNet & 14.637 $\pm$ 3.668 & 0.742 $\pm$ 0.186 & -0.022 $\pm$ 0.097 & 0.938 $\pm$ 0.023 \\
+		Graph U-Net & 10.385 $\pm$ 1.895 & \textbf{0.489 $\pm$ 0.105} & -0.138 $\pm$ 0.258 & \textbf{0.967 $\pm$ 0.019} \\
+		\bottomrule
+	\end{tabular}
+\end{table}
 
-\lipsum[70]
+\begin{table}
+	\caption{Running time for one simulation on 16 CPU cores of an AMD Ryzen™ Threadripper™ 3960X compared to training and inference time of the different models on an NVIDIA GEFORCE RTX 3090. The inference time is given for one call of a model on a batch of 32000 nodes, for one simulation we need around a hundred calls to get a result on the entire mesh as the nodes are chosen randomly on the CFD mesh. The number of parameters for each model is given as additional information.}
+	\label{tab:time}
+	\centering
+	\begin{tabular}{ccccc}
+		\toprule
+		Model & \multicolumn{2}{c}{Running time} & \# Parameters \\
+		& Training & Inference (\si{\micro\second}) & \\
+		\midrule
+		MLP & $\sim$\SI{2}{\hour}\SI{20}{\minute} & 13.3 $\pm$ 0.2 & 19988 \\
+		GraphSAGE & $\sim$\SI{4}{\hour}\SI{20}{\minute} & 20.9 $\pm$ 2.3 & 29204 \\
+		PointNet & $\sim$\SI{2}{\hour}\SI{40}{\minute} & 33.9 $\pm$ 3.5 & 75244\\
+		Graph U-Net & $\sim$\SI{6}{\hour}\SI{50}{\minute} & 357.8 $\pm$ 36.9 & 65820\\
+		\midrule
+		Simulation & \multicolumn{2}{c}{$\sim$\SI{25}{\minute}} &  \\
+		Dataset & \multicolumn{2}{c}{$\sim$20 days} &  \\
+		\bottomrule
+	\end{tabular}
+\end{table}
 
+\begin{figure}
+	\centering
+	\includegraphics[width = \linewidth]{Results/coefs.png}
+	\caption{Predicted drag (left) and lift (right) coefficients with respect to the true ones. The mean (top) and standard deviation (bottom) of each point on the five copies of the trained models are separated for sake of readability. Linear regression is done for each point cloud to highlight linear trends. On the top plots, the Identity graph is given in black for comparison.}
+	\label{fig:coefs}
+\end{figure}
+
+\begin{table}
+	\caption{Mean squared error on the different normalized fields, relative error, and Spearman's correlation for the force coefficients on the four different tasks for the GraphSAGE model. Only the reduced pressure is given on the surface ($\Bar{p}_s$) as the other quantities are null via the boundary conditions.}
+	\label{tab:score_GSAGE}
+	\centering
+	\begin{tabular}{ccccc}
+		\toprule
+		Field / Coefficient & \multicolumn{4}{c}{Task}  \\
+		& Full & Scarce & Reynolds & AoA \\
+		\midrule
+		$\Bar{u}_x$ ($\times 10^{-2}$) & 0.832 $\pm$ 0.015 & 1.457 $\pm$ 0.125 & 7.558 $\pm$ 1.046 & 4.435 $\pm$ 0.334 \\
+		$\Bar{u}_y$ ($\times 10^{-2}$) & 0.994 $\pm$ 0.052 & 1.454 $\pm$ 0.123 & 3.498 $\pm$ 0.613 & 9.400 $\pm$ 2.167 \\
+		$\Bar{p}$ ($\times 10^{-2}$) & 0.661 $\pm$ 0.050 & 4.696 $\pm$ 0.804 & 3.826 $\pm$ 0.248 & 10.908 $\pm$ 2.164 \\
+		$\nu_t$ ($\times 10^{-1}$) & 0.160 $\pm$ 0.021 & 0.611 $\pm$ 0.079 & 1.694 $\pm$ 0.383 & 5.178 $\pm$ 0.365 \\
+		$\Bar{p}_s$ ($\times 10^{-1}$) & 0.662 $\pm$ 0.103 & 1.945 $\pm$ 0.336 & 1.797 $\pm$ 0.338 & 7.638 $\pm$ 0.945 \\
+		\midrule
+		$C_D$ & 4.050 $\pm$ 0.704 & 3.504 $\pm$ 0.998 & 8.971 $\pm$ 1.278 & 5.589 $\pm$ 1.090 \\
+		$C_L$ & 0.517 $\pm$ 0.162 & 0.385 $\pm$ 0.097 & 0.616 $\pm$ 0.124 & 0.818 $\pm$ 0.300 \\
+		$\rho_D$ & -0.303 $\pm$ 0.124 & -0.139 $\pm$ 0.175 & 0.013 $\pm$ 0.064 & 0.055 $\pm$ 0.171 \\
+		$\rho_L$ & 0.965 $\pm$ 0.011 & 0.981 $\pm$ 0.006 & 0.927 $\pm$ 0.027 & 0.908 $\pm$ 0.019 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+From the plots of the different examples of boundary layers and skin friction coefficients given in Appendix~\ref{ap:results}, we conclude that the models have difficulties to predict the wall shear stresses as the velocity values at the closest nodes from the geometry are often largely overestimated. This particularly affects the accuracy of the drag coefficient as we can see with the Spearman's correlation $\rho_D$, the relative error on the drag coefficient, and the plot of the predicted drag with respect to the true drag coefficients (see Figure~\ref{fig:coefs} left). However, the wall shear stress has a small impact on the lift coefficient compared to the pressure at the surface of airfoils. Hence, as the pressure is more accurately inferred compared to the wall shear stress, as we can see by looking at the plots of the pressure coefficient at the surface of airfoils in Appendix~\ref{ap:results}, the inferred lift coefficient is also more accurately inferred and the rank is better predicted (see Figure~\ref{fig:coefs} right) leading to a Spearman's correlation close to one.
+
+\paragraph{Difficulties of the different tasks.} In Table~\ref{tab:score_GSAGE} we give the scores of the GraphSAGE model on the four different tasks. The scores are given on the test set associated with each task. This makes difficult the direct comparison as the test set for the Reynolds and angle of attack extrapolation regimes are both different from the test set of the full and scarce regimes.
+
+In the full and scarce regime, the MSE over the different fields shows that the GraphSAGE model is performing better in interpolation when more data is available, as expected. However, the scores on the force coefficients are slightly higher in the scarce regime which tells us that the MSE over the different fields is not necessarily a good proxy for the accuracy of the force coefficients. This can be understood as the computations of the force coefficients involve an integration over the surface and can lead to the accumulation or compensation of local errors.
+
+In the Reynolds and angle of attack extrapolation regimes, the MSE scores are significantly higher than in the full and scarce data regimes. As expected, the extrapolation tasks are more difficult than the interpolation tasks. The Spearman's correlation for the lift coefficient is also significantly lower for both extrapolation tasks than for the interpolation ones, supporting the previous observation.
+
+Finally, in Table~\ref{tab:time}, we confirm that even for a two-dimensional case, the training cost of models is rapidly amortized (after, in the worst case, a dozen of simulations).
+
+\section{Conclusion}\label{sec:conclusion}
+In this work, we presented a high-fidelity dataset of solutions of the two-dimensional RANS equations around NACA airfoils. Simulations have been done at Reynolds of the order of magnitude of what we find in subsonic flight regimes mimicking classical aerodynamics setups. We defined four ML tasks highlighting the different challenges of surrogate models, from scarce data regimes to extrapolation. We proposed different metrics focusing not only on the velocity and pressure fields but also on the force coefficients. Those metrics quantify the ability of ML models to accurately predict fields and force coefficients in addition to their ability to rank the latter, for example, for shape optimization. Different baselines have been introduced from the GDL framework, highlighting the need for models that can handle unstructured point clouds in order to be able to accurately predict force coefficients. Those baselines have shown in the proposed setting, as expected, that the prediction of the drag coefficient is more challenging than the prediction of the lift coefficient as the wall shear stress is derived from the velocity field and not directly regressed like the pressure.
+
+\paragraph{Metrics hierarchy.} From a design-oriented perspective we may set a hierarchy for the proposed metrics. The Spearman's correlation for the force coefficients is the main metrics to maximize the recovery of the best airfoils in terms of lift-over-drag ratio as it quantifies the ability of models to preserve the force coefficient ranks. In addition to this metric, the plots of the predicted with respect to true force coefficients give qualitative information on the accuracy of the model for each simulation of the test set. Then, the relative errors for the force coefficients are important but not crucial from a design perspective and their minimization is secondary. We may say that a model is effective if it has Spearman's correlations close to one and accurate if it has low relative errors and low MSE on the fields over the volume and the airfoil. The goal here is an effective and accurate model. For relative errors, the bound of \SI{5}{\percent} is often used to state that a model is accurate enough.
+
+\paragraph{Limitations.} Concerning the dataset itself, we restricted the design space of airfoils to NACA 4 and 5 digits for the sake of simplicity and meshing automation but we can expect that models trained on this dataset will have difficulties generalizing to more exotic shapes. Following this, we did not propose an extrapolation test on out-of-distribution airfoils. Also, even though the problem proposed is a classical aerodynamics one, it is two-dimensional and does not reflect entirely the complexity of three-dimensional natural phenomena which implies that models working on this dataset could not necessarily be extended to more generic three-dimensional cases.
+
+In terms of baselines, we proposed four architectures of different types, an MLP, a GNN, a network acting on point clouds, and a multi-scale GNN architecture. The GNN approach suffers from its heaviness when dealing with large graphs leading to the necessity of building a downsampling strategy. In addition to that, auto differentiation with respect to positions is not possible with GNN as an entire graph is given in inputs. This leads to difficulties in the inference process and the need to rely on input CFD meshes to compute derivatives using numerical schemes. On the other hand, the MLP approach allows more flexibility and does not require a subsampling strategy or the input CFD mesh to compute derivatives. Uniform sampling is also possible in this case and several models have already shown their ability to fit complex signals \cite{siren,bacon}. The main downside of such approaches is the generalization capacity requiring conditioning or hypernetworks to work on multiple examples and generalize to unseen ones. Moreover, let us mention equivariant networks \cite{brandstetter2022geometric} as another promising direction to handle the lack of data often encountered in such tasks by leveraging symmetries of the problem. Finally, neural operators handling unstructured data such as DeepONet \cite{lu2021learning} are by definition well suited for such tasks and could be mixed with previous techniques to achieve high-performance surrogate models.
+
+In total, we consider this work as a first step towards the generic treatment of real-world physical phenomena in ML. We hope that it will lower the potential barrier for entering the field of ML applied to physical systems and that it will encourage the construction of models that are not only good on the predicted fields but also on meaningful derived quantities.
+
+\begin{subappendices}	
+	\section{Reproducibility statement}
+	
+	We provide a  \href{https://github.com/Extrality/AirfRANS}{GitHub repository} to reproduce all the experiments and a \href{https://data.isir.upmc.fr/extrality/NeurIPS_2022/Dataset.zip}{link} to download the preprocessed dataset and \href{https://data.isir.upmc.fr/extrality/NeurIPS_2022/OF_dataset.zip}{another one} for the raw OpenFOAM data. The experiments have been conducted with a single NVIDIA RTX 3090 24Go. The repository the preprocessed/raw datasets include:
+	\begin{itemize}
+		\item code to reproduce the ML experiments
+		\item code to generate the figures.
+	\end{itemize}
+	
+	We also provide a \href{https://github.com/Extrality/NACA_simulation}{GitHub repository} to run new simulations and to be able to reproduce the generation settings of the dataset. The simulations have been done with 16 CPU cores of an AMD Ryzen™ Threadripper™ 3960X. The codes in the repository include:
+	\begin{itemize}
+		\item (extensible) code to generate the meshes
+		\item code to run new simulations and/or build the dataset.
+	\end{itemize}
+	
+	Finally, we provide the \href{https://airfrans.readthedocs.io/en/latest/index.html}{AirfRANS Python library} with its associated \href{https://github.com/Extrality/airfrans_lib}{GitHub repository} to easily manipulate simulations from the dataset.
+	
+	\section{Constant and Dimensionless Quantities}\label{ap:dimensionless}
+	The fluid used in this study is the air at \SI{298.15}{\kelvin} (\SI{25}{\celsius}) and at sea level on earth. In Table~\ref{tab:air_properties} we give the different values of the constant associated with this fluid.
+	
+	\begin{table}
+		\centering
+		\begin{threeparttable}
+			\caption{Properties of air at \SI{298.15}{\kelvin} (\SI{25}{\celsius}) and at sea level on earth.}
+			\label{tab:air_properties}
+			\begin{tabular}{ccc}
+				\toprule
+				Name & Symbol & Value                  \\
+				\midrule
+				Kinematic viscosity & $\nu$ & \SI{1.56e-5}{\square\meter\per\second} \\
+				Specific mass\tnote{$\star$} & $\rho$ & \SI{1.184}{\kilogram\per\cubic\meter} \\
+				Thermal diffusivity\tnote{$\star$} & $\alpha$ & \SI{2.25e-5}{\meter\per\second} \\
+				Specific heat\tnote{$\star$} & $c_p$ & \SI{1005}{\joule\per\kilogram\per\kelvin} \\
+				Atmospheric pressure\tnote{$\star$} & $p_0$ & \SI{1.013e5}{\newton\per\square\meter} \\
+				Atmospheric temperature\tnote{$\star$} & $T_0$ & \SI{298.15}{\kelvin} \\
+				Speed of sound in the fluid\tnote{$\star$} & $c$ & \SI{346.1}{\meter\per\second} \\
+				\bottomrule
+			\end{tabular} \hspace{1cm}
+			\begin{tablenotes}
+				\item [$\star$] Those values are important only in the compressible case, they are given for comparison with compressible simulations. Especially, the absolute pressure is set to \SI{0}{\newton\per\square\meter} for the incompressible case as it only depends on the differential pressure.
+			\end{tablenotes}
+		\end{threeparttable}
+	\end{table}
+	
+	The only dimensionless quantity for the incompressible case is the Reynolds number $Re$. We add the Mach number $Ma$ and the Prandtl number $Pr$ in the compressible case. Those quantities are defined by:
+	\begin{align}
+		Re = \frac{UL}{\nu}, \quad Ma = \frac{U}{c}, \quad Pr = \frac{\nu}{\alpha}
+	\end{align}
+	where $U$ is the characteristic velocity of the problem, $L$ its characteristic length, $c$ the speed of sound in the fluid, $\nu$ its kinematic viscosity and $\alpha$ its thermal diffusivity. The Reynolds number compares the order of magnitude of the convective term with respect to the diffusive term in the Navier–Stokes equations, the Mach number quantifies flow compressibility and the Prandtl number compares the order of magnitude of the variation of energy via momentum with respect to the variation of energy via heat transfer in the compressible form of Navier–Stokes equations.
+\end{subappendices}

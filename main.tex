@@ -39,10 +39,12 @@
 \usepackage[
     backend=biber, 
     natbib=true,
-    style=numeric,
-    sorting=none
+    style=nature,
+    sorting=none,
 ]{biblatex} %Imports biblatex package
+\usepackage{xurl}
 \usepackage{csquotes}
+\renewcommand{\UrlFont}{\small}
 
 \addbibresource{
 	bibliography/intro.bib,
@@ -57,7 +59,16 @@
 
 \usepackage{graphicx} % to include images
 %\usepackage[pdftex]{graphicx}
-\graphicspath{ {figures/} }
+\graphicspath{
+	{figures/},
+	{figures/chap11},
+	{figures/chap12},
+	{figures/chap13},
+	{figures/chap21},
+	{figures/chap22},
+	{figures/chap23},
+	{figures/chap24}	
+}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{float}
@@ -65,6 +76,7 @@
 \usepackage{array, multirow, tabularx}
 \usepackage{booktabs}
 \usepackage{longtable}
+\usepackage{threeparttable}
 \usepackage{apalike}
 \usepackage{minitoc}
 \usepackage{tikz}
@@ -73,6 +85,16 @@
 \setlength{\headheight}{15pt}
 \usepackage[strict]{changepage}
 \usepackage{siunitx}
+\usepackage{appendix}
+\AtBeginEnvironment{subappendices}{
+	\addcontentsline{toc}{chapter}{Appendices}
+	\counterwithin{figure}{section}
+	\counterwithin{table}{section}
+}
+\AtEndEnvironment{subappendices}{
+	\counterwithout{figure}{section}
+	\counterwithout{table}{section}
+}
 
 \usepackage{enumitem}
 \usepackage{epigraph}
@@ -206,11 +228,11 @@ Devant un jury composé de : %(indiquer le jury complet)
 
 \frontmatter % numérote les pages en chiffres romains jusqu'a la commande mainmatter
 
-%----------------------------------------------------------------------------------------
-%	RESUME ET ABSTRACT PAGE
-%----------------------------------------------------------------------------------------
-\input{auxilliaires/resume} %résumé en francais
-%\input{auxilliaires/astract} %résumé en anglais
+%%----------------------------------------------------------------------------------------
+%%	RESUME ET ABSTRACT PAGE
+%%----------------------------------------------------------------------------------------
+%\input{auxilliaires/resume} %résumé en francais
+%%\input{auxilliaires/astract} %résumé en anglais
 
 %----------------------------------------------------------------------------------------
 %	QUOTATION PAGE ou DEDICACE
@@ -229,15 +251,15 @@ L’Enfer – Chant XXXI, La Divine Comédie, Dante Alighieri
 %----------------------------------------------------------------------------------------
 
 
-%----------------------------------------------------------------------------------------
-%	ACKNOWLEDGEMENTS
-%----------------------------------------------------------------------------------------
-\input{auxilliaires/remerciements}
+%%----------------------------------------------------------------------------------------
+%%	ACKNOWLEDGEMENTS
+%%----------------------------------------------------------------------------------------
+%\input{auxilliaires/remerciements}
 
-%----------------------------------------------------------------------------------------
-%	AVANT-PROPOS
-%----------------------------------------------------------------------------------------
-\input{auxilliaires/avant-propos.tex}
+%%----------------------------------------------------------------------------------------
+%%	AVANT-PROPOS
+%%----------------------------------------------------------------------------------------
+%\input{auxilliaires/avant-propos.tex}
 
 %----------------------------------------------------------------------------------------
 %	LIST OF CONTENTS/FIGURES/TABLES PAGES
@@ -252,10 +274,10 @@ L’Enfer – Chant XXXI, La Divine Comédie, Dante Alighieri
 \newpage
 
 
-%----------------------------------------------------------------------------------------
-%	Liste des abréviations-
-%----------------------------------------------------------------------------------------
-\input{auxilliaires/abreviations}
+%%----------------------------------------------------------------------------------------
+%%	Liste des abréviations-
+%%----------------------------------------------------------------------------------------
+%\input{auxilliaires/abreviations}
 
 
 % --------------------------------------------------------------
@@ -270,54 +292,54 @@ L’Enfer – Chant XXXI, La Divine Comédie, Dante Alighieri
 
 \fancyhead{} % clear all header fields
 \fancyhead[RO]{\leftmark}
-\begin{refsection}[bibliography/intro]
-	\input{chapters/intro.tex} %partie introduction ou avant-propos
-	\printbibliography[heading=subbibintoc]
-\end{refsection}
+%%\begin{refsection}[bibliography/intro]
+%%	\input{chapters/intro.tex} %partie introduction ou avant-propos
+%%	\printbibliography[heading=subbibintoc]
+%%\end{refsection}
 
 \fancyhead[LE]{\textsc{\chaptername~\thechapter}}
 \part{Datasets}
-\begin{refsection}[bibliography/chap11]
-	\input{chapters/chap11}
-	\printbibliography[heading=subbibintoc, resetnumbers=true]
-\end{refsection}
+%%\begin{refsection}[bibliography/chap11]
+%%	\input{chapters/chap11}
+%%	\printbibliography[heading=subbibintoc, resetnumbers=true]
+%%\end{refsection}
 
 \begin{refsection}[bibliography/chap12]
 	\input{chapters/chap12}
 	\printbibliography[heading=subbibintoc, resetnumbers=true]
 \end{refsection}
 
-\begin{refsection}[bibliography/chap13]
-	\input{chapters/chap13}
-	\printbibliography[heading=subbibintoc,resetnumbers=true]
-\end{refsection}
+%%\begin{refsection}[bibliography/chap13]
+%%	\input{chapters/chap13}
+%%	\printbibliography[heading=subbibintoc,resetnumbers=true]
+%%\end{refsection}
 
-\part{Signal approximation and preconditioning}
-\begin{refsection}[bibliography/chap21]
-	\input{chapters/chap21}
-	\printbibliography[heading=subbibintoc, resetnumbers=true]
-\end{refsection}
-
-\begin{refsection}[bibliography/chap22]
-	\input{chapters/chap22}
-	\printbibliography[heading=subbibintoc, resetnumbers=true]
-\end{refsection}
-
-\begin{refsection}[bibliography/chap23]
-	\input{chapters/chap23}
-	\printbibliography[heading=subbibintoc, resetnumbers=true]
-\end{refsection}
-
-\begin{refsection}[bibliography/chap24]
-	\input{chapters/chap24}
-	\printbibliography[heading=subbibintoc, resetnumbers=true]
-\end{refsection}
-
-\newpage
-\fancyhead[LE]{}
-\input{chapters/objectifs}
-\input{chapters/discussion.tex}
-\input{chapters/conclusion.tex}
+%%\part{Signal approximation and preconditioning}
+%%\begin{refsection}[bibliography/chap21]
+%%	\input{chapters/chap21}
+%%	\printbibliography[heading=subbibintoc, resetnumbers=true]
+%%\end{refsection}
+%%
+%%\begin{refsection}[bibliography/chap22]
+%%	\input{chapters/chap22}
+%%	\printbibliography[heading=subbibintoc, resetnumbers=true]
+%%\end{refsection}
+%%
+%%\begin{refsection}[bibliography/chap23]
+%%	\input{chapters/chap23}
+%%	\printbibliography[heading=subbibintoc, resetnumbers=true]
+%%\end{refsection}
+%%
+%%\begin{refsection}[bibliography/chap24]
+%%	\input{chapters/chap24}
+%%	\printbibliography[heading=subbibintoc, resetnumbers=true]
+%%\end{refsection}
+%%
+%%\newpage
+%%\fancyhead[LE]{}
+%%\input{chapters/objectifs}
+%%\input{chapters/discussion.tex}
+%%\input{chapters/conclusion.tex}
 
 %----------------------------------------------------------------------------------------
 %	BIBLIOGRAPHY
