@@ -123,6 +123,8 @@ To qualitatively check this accuracy, we propose to plot the components of the v
 
 In terms of quantitative metrics, we use the MSE for each field on the volume and over the airfoil to measure the accuracy of our models. Moreover, we compute the mean and standard deviation of the relative error on the drag and lift coefficients. Finally, we compute Spearman's rank correlation coefficient between the true and predicted force coefficients. From a design process point of view, the last coefficient is the most crucial quantity to maximize as it quantifies the monotonic correlation between the true and predicted force coefficients. If this coefficient is close to 1, we can expect our model to be able to find the best airfoil maximizing or minimizing the chosen force coefficient even if the inferred value is not close to the true value.
 
+\paragraph{Metrics hierarchy.} From a design-oriented perspective we may set a hierarchy for the proposed metrics. The Spearman's correlation for the force coefficients is the main metrics to maximize the recovery of the best airfoils in terms of lift-over-drag ratio as it quantifies the ability of models to preserve the force coefficient ranks. In addition to this metric, the plots of the predicted with respect to true force coefficients give qualitative information on the accuracy of the model for each simulation of the test set. Then, the relative errors for the force coefficients are important but not crucial from a design perspective and their minimization is secondary. We may say that a model is effective if it has Spearman's correlations close to one and accurate if it has low relative errors and low MSE on the fields over the volume and the airfoil. The goal here is an effective and accurate model. For relative errors, the bound of \SI{5}{\percent} is often used to state that a model is accurate enough.
+
 \section{Benchmarking Results}\label{sec:results}
 To propose baselines for the problem, we train three standard GDL models and a Multi-Layer Perceptron (MLP) in the full data regime. The associated results for the three other tasks are given in Appendix~\ref{ap:results}. Each model is preceded by an encoder and followed by a decoder, both defined by a MLP and trained together with the model. We follow the setup defined in the previous section for the training and testing procedures. Each model is trained 5 times to compute a mean and a standard deviation for the different metrics. For each metric, we bold the best-performing method. We choose as baselines a GraphSAGE \cite{gsage}, a PointNet \cite{qi2016pointnet}, a Graph U-Net \cite{gunet} and a MLP. Those baselines have been chosen as they access different types of information. The MLP only has access to the features of the nodes, the GraphSAGE has in addition access to local neighborhood information, the PointNet conditioned a deep MLP with global features, and the Graph U-Net access from local to global neighborhood information via its multi-scale architecture. Models are trained in the same conditions and the details of architectures and hyperparameters can be found in Appendix~\ref{ap:models}.
 
@@ -227,8 +229,6 @@ Finally, in Table~\ref{tab:time}, we confirm that even for a two-dimensional cas
 \section{Conclusion}\label{sec:conclusion}
 In this work, we presented a high-fidelity dataset of solutions of the two-dimensional RANS equations around NACA airfoils. Simulations have been done at Reynolds of the order of magnitude of what we find in subsonic flight regimes mimicking classical aerodynamics setups. We defined four ML tasks highlighting the different challenges of surrogate models, from scarce data regimes to extrapolation. We proposed different metrics focusing not only on the velocity and pressure fields but also on the force coefficients. Those metrics quantify the ability of ML models to accurately predict fields and force coefficients in addition to their ability to rank the latter, for example, for shape optimization. Different baselines have been introduced from the GDL framework, highlighting the need for models that can handle unstructured point clouds in order to be able to accurately predict force coefficients. Those baselines have shown in the proposed setting, as expected, that the prediction of the drag coefficient is more challenging than the prediction of the lift coefficient as the wall shear stress is derived from the velocity field and not directly regressed like the pressure.
 
-\paragraph{Metrics hierarchy.} From a design-oriented perspective we may set a hierarchy for the proposed metrics. The Spearman's correlation for the force coefficients is the main metrics to maximize the recovery of the best airfoils in terms of lift-over-drag ratio as it quantifies the ability of models to preserve the force coefficient ranks. In addition to this metric, the plots of the predicted with respect to true force coefficients give qualitative information on the accuracy of the model for each simulation of the test set. Then, the relative errors for the force coefficients are important but not crucial from a design perspective and their minimization is secondary. We may say that a model is effective if it has Spearman's correlations close to one and accurate if it has low relative errors and low MSE on the fields over the volume and the airfoil. The goal here is an effective and accurate model. For relative errors, the bound of \SI{5}{\percent} is often used to state that a model is accurate enough.
-
 \paragraph{Limitations.} Concerning the dataset itself, we restricted the design space of airfoils to NACA 4 and 5 digits for the sake of simplicity and meshing automation but we can expect that models trained on this dataset will have difficulties generalizing to more exotic shapes. Following this, we did not propose an extrapolation test on out-of-distribution airfoils. Also, even though the problem proposed is a classical aerodynamics one, it is two-dimensional and does not reflect entirely the complexity of three-dimensional natural phenomena which implies that models working on this dataset could not necessarily be extended to more generic three-dimensional cases.
 
 In terms of baselines, we proposed four architectures of different types, an MLP, a GNN, a network acting on point clouds, and a multi-scale GNN architecture. The GNN approach suffers from its heaviness when dealing with large graphs leading to the necessity of building a downsampling strategy. In addition to that, auto differentiation with respect to positions is not possible with GNN as an entire graph is given in inputs. This leads to difficulties in the inference process and the need to rely on input CFD meshes to compute derivatives using numerical schemes. On the other hand, the MLP approach allows more flexibility and does not require a subsampling strategy or the input CFD mesh to compute derivatives. Uniform sampling is also possible in this case and several models have already shown their ability to fit complex signals \cite{siren,bacon}. The main downside of such approaches is the generalization capacity requiring conditioning or hypernetworks to work on multiple examples and generalize to unseen ones. Moreover, let us mention equivariant networks \cite{brandstetter2022geometric} as another promising direction to handle the lack of data often encountered in such tasks by leveraging symmetries of the problem. Finally, neural operators handling unstructured data such as DeepONet \cite{lu2021learning} are by definition well suited for such tasks and could be mixed with previous techniques to achieve high-performance surrogate models.
@@ -238,19 +238,24 @@ In total, we consider this work as a first step towards the generic treatment of
 \begin{subappendices}	
 	\section{Reproducibility statement}
 	
-	We provide a  \href{https://github.com/Extrality/AirfRANS}{GitHub repository} to reproduce all the experiments and a \href{https://data.isir.upmc.fr/extrality/NeurIPS_2022/Dataset.zip}{link} to download the preprocessed dataset and \href{https://data.isir.upmc.fr/extrality/NeurIPS_2022/OF_dataset.zip}{another one} for the raw OpenFOAM data. The experiments have been conducted with a single NVIDIA RTX 3090 24Go. The repository the preprocessed/raw datasets include:
-	\begin{itemize}
-		\item code to reproduce the ML experiments
-		\item code to generate the figures.
-	\end{itemize}
+	We provide a  \href{https://github.com/Extrality/AirfRANS}{GitHub repository} to reproduce all the experiments and a \href{https://data.isir.upmc.fr/extrality/NeurIPS_2022/Dataset.zip}{link} to download the preprocessed dataset and \href{https://data.isir.upmc.fr/extrality/NeurIPS_2022/OF_dataset.zip}{another one} for the raw OpenFOAM data. The experiments have been conducted with a single NVIDIA RTX 3090 24Go. The repository include code to reproduce the ML experiments and code to generate the figures.
 	
-	We also provide a \href{https://github.com/Extrality/NACA_simulation}{GitHub repository} to run new simulations and to be able to reproduce the generation settings of the dataset. The simulations have been done with 16 CPU cores of an AMD Ryzen™ Threadripper™ 3960X. The codes in the repository include:
-	\begin{itemize}
-		\item (extensible) code to generate the meshes
-		\item code to run new simulations and/or build the dataset.
-	\end{itemize}
+	We also provide a \href{https://github.com/Extrality/NACA_simulation}{GitHub repository} to run new simulations and to be able to reproduce the generation settings of the dataset. The simulations have been done with 16 CPU cores of an AMD Ryzen™ Threadripper™ 3960X. The codes in the repository include (extensible) code to generate the meshes and code to run new simulations and/or build the dataset.
 	
 	Finally, we provide the \href{https://airfrans.readthedocs.io/en/latest/index.html}{AirfRANS Python library} with its associated \href{https://github.com/Extrality/airfrans_lib}{GitHub repository} to easily manipulate simulations from the dataset.
+	
+	\section{Description Of Software}
+	In this section, we describe the tools that we have used in this work to build the dataset\footnote{similar to our first version of our dataset \cite{bonnet2022an}}, make the visualizations, and train the models. This work makes use of computational fluid dynamics (CFD) and ML tools.
+	
+	\textbf{OpenFOAM} \cite{OpenFOAM} stands for \emph{Open-source Field Operation And Manipulation}, a C++ software for developing custom numerical solvers to study continuum mechanics and CFD problems. In this work, we have used version v2112 of OpenFOAM to make our simulations. OpenFOAM is released as free and open-source software under the \emph{GNU General Public Licence}.
+	
+	\textbf{ParaView} \cite{paraview} is an open-source visualization tool designed to explore and visualize efficiently large data using quantitative and qualitative metrics. ParaView runs on distributed and shared memory parallel and single processor systems. In this work, we have used it to visualize the following: point clouds, meshes, the predicted (as well as the ground truth) physical fields. We have used version 5.10.0 of ParaView in this work. ParaView  is released  as free and open-source software under the \emph{Berkeley Software Distribution License}.
+	
+	\textbf{PyVista} \cite{pyvista} is an open-source tool based on a handy interface for the Visualization ToolKit (VTK). It is simple to use in interaction with NumPy \cite{numpy} and other Python libraries. It is mainly used for mesh analysis. In this work, we use PyVista to build the inputs of our DL models. We have used version 0.36.1 of PyVista in this work. PyVista is released as free and open-source software under the \emph{MIT License}.
+	
+	\textbf{PyTorch} \cite{NEURIPS2019_9015} is an open-source library for DL using GPUs and CPUs. In this work, we use PyTorch to build our training protocol. In this work, we have used version 1.11.0 of Pytorch along with CUDA 11.3 and Python 3.9.12. PyTorch is released as free and open-source \emph{Berkeley Software Distribution License}.
+	
+	\textbf{PyTorch Geometric} (PyG) \cite{fey2019graph} is an open-source library for GDL built upon PyTorch which targets the training  of geometric neural networks, including point clouds, graphs and meshes. We use PyG to design our message passing schemes. In this work, we have used version 2.0.4 of PyG along with CUDA 11.3. PyG is released as free and open-source software under the \emph{MIT License}.
 	
 	\section{Constant and Dimensionless Quantities}\label{ap:dimensionless}
 	The fluid used in this study is the air at \SI{298.15}{\kelvin} (\SI{25}{\celsius}) and at sea level on earth. In Table~\ref{tab:air_properties} we give the different values of the constant associated with this fluid.
@@ -284,4 +289,429 @@ In total, we consider this work as a first step towards the generic treatment of
 		Re = \frac{UL}{\nu}, \quad Ma = \frac{U}{c}, \quad Pr = \frac{\nu}{\alpha}
 	\end{align}
 	where $U$ is the characteristic velocity of the problem, $L$ its characteristic length, $c$ the speed of sound in the fluid, $\nu$ its kinematic viscosity and $\alpha$ its thermal diffusivity. The Reynolds number compares the order of magnitude of the convective term with respect to the diffusive term in the Navier–Stokes equations, the Mach number quantifies flow compressibility and the Prandtl number compares the order of magnitude of the variation of energy via momentum with respect to the variation of energy via heat transfer in the compressible form of Navier–Stokes equations.
+	
+	\section{Reynolds-Averaged Navier–Stokes Equations}\label{ap:RANS}
+	Under certain assumptions, the dynamics of a fluid is governed by the Navier–Stokes equations. Those equations are composed of a continuity equation, three momentum equations and an energy equation (see §49 of \cite{landau} and §5.3 of \cite{wilcox}):
+	\begin{align} \label{eq:NS}
+		\partial_t\rho + \partial_i(\rho u_i) &= 0 \\
+		\partial_t(\rho u_i) + \partial_j (\rho u_ju_i) &= -\partial_i p + \partial_j\sigma_{ji}, \quad i\in\{1, 2, 3\} \\
+		\partial_t\left(\rho \left(\epsilon + \frac{1}{2}u^2\right)\right) + \partial_j \left(\rho u_j \left(h + \frac{1}{2}u^2\right)\right) &= \partial_j(u_i\sigma_{ij}) - \partial_j q_j \label{eq:energy_eq}
+	\end{align}
+	where $\partial_t$ denotes a partial derivative with respect to time, $\partial_i$ a partial derivative with respect to the $i^{th}$ space coordinate, $\rho$ the fluid specific mass, $u$ the fluid velocity, $p$ the fluid pressure, $\sigma$ the viscous stress tensor, $\epsilon$ the fluid specific energy, $h$ the fluid specific enthalpy ($h := \epsilon + p/\rho$) and $q$ the heat flux density due to thermal conduction. Moreover, we used the Einstein summation convention over repeated indices. Finally, fluid dynamics theory, thermodynamic relations, Fourier law and the perfect gas law give us:
+	\begin{align}
+		\sigma_{ij} &= \mu \left(\partial_iu_j + \partial_ju_i - \frac{2}{3}\partial_ku_k\delta_{ij}\right), \quad i,\,j\in\{1,2,3\} \\
+		\epsilon &= c_v T \\
+		h &= c_p T \\
+		q_i &= -\kappa\partial_iT, \quad i\in\{1,2,3\} \\
+		p &= \rho RT \label{eq:state}
+	\end{align}
+	where $\delta_{ij}$ is the kronecker tensor, $T$ the fluid temperature, $\mu$ the fluid dynamic viscosity (function of $T$), $\kappa$ the fluid thermal conductivity (function of $T$), $R$ the fluid specific constant, $c_v$ and $c_p$ the fluid specific heat coefficient for constant volume and pressure respectively (taken constant here). This leads to a close set of partial differential equations with 6 unknowns ($\rho$, $p$, $u$, $T$) and 6 equations:
+	\begin{align}
+		\partial_t\rho + \partial_i(\rho u_i) &= 0 \\
+		\partial_t(\rho u_i) + \partial_j (\rho u_ju_i) &= -\partial_i p + \partial_j\left(\mu\left(\partial_iu_j + \partial_ju_i - \frac{2}{3}\mu\partial_ku_k\delta_{ij}\right)\right) , \, i\in\{1, 2, 3\}	
+	\end{align}
+	\vspace{-0.7cm}
+	\begin{multline}
+		\partial_t\left(\rho \left(c_vT + \frac{1}{2}u^2\right)\right) + \partial_j \left(\rho u_j \left(c_pT + \frac{1}{2}u^2\right)\right) \\ = \partial_j\left(\mu u_i\left(\partial_iu_j + \partial_ju_i - \frac{2}{3}\partial_ku_k\delta_{ij}\right)\right) + \partial_j (\kappa\partial_jT)
+	\end{multline}
+	together with the state equation \ref{eq:state}. We chose the perfect gas law for the state equation as we are going to treat the case of air but this equation can be replaced by any state equation better suited for the problem.
+	
+	In certain cases, we can decently assume that the fluid is incompressible with constant density $\rho$. We then need only 4 equations to close the problem. We get rid of the energy and state equations and find the incompressible Navier–Stokes equations:
+	\begin{align}
+		\partial_i u_i &= 0 \\
+		\partial_tu_i + \partial_j(u_iu_j) &= -\partial_i\left(\frac{p}{\rho}\right) + \nu\partial^2_{jj}u_i, \quad i\in\{1,2,3\}
+	\end{align}
+	where $\nu := \mu/\rho$ is the fluid kinematic viscosity, taken constant in this case. In order to explicitly write an important dimensionless quantity in fluid mechanics, we can rewrite last equations with dimensionless variables. Let us define, $T$, $U$, $L$ and $P$ characteristic time, velocity, length and pressure of the problem, respectively. We write:
+	\begin{align}
+		t = T\hat{t}, \quad u = U\hat{u}, \quad x = L\hat{x}, \quad p = P\hat{p}
+	\end{align}
+	where x is the cartesian position, $\hat{t}$, $\hat{u}$, $\hat{x}$ and $\hat{p}$ are dimensionless quantities. If we write $P = \rho U^2$ and $T = L/U$, we find for the incompressible case:
+	\begin{align}
+		\partial_{\hat{i}} \hat{u}_i &= 0 \\
+		\partial_{\hat{t}}\hat{u}_i + \partial_{\hat{j}}(\hat{u}_i\hat{u}_j) &= -\partial_{\hat{i}}\hat{p} + \frac{1}{Re}\partial^2_{\hat{j}\hat{j}}\hat{u}_i, \quad i\in\{1,2,3\}
+	\end{align}
+	where $Re := UL/\nu$ is the Reynolds number. This dimensionless number quantifies the importance of the convective term with respect to the diffusive term (in order of magnitude):
+	\begin{align}
+		\frac{\|\partial_j (u_iu_j)\|}{\nu\|\partial^2_{jj}u_i\|} \approx \frac{UL}{\nu} = Re
+	\end{align}
+	When the Reynolds number tends to $0$, diffusion term are dominant, we call it a Stokes flow. When the Reynolds number tends to $\infty$, the equations get closer to the Euler equations for inviscid fluid. At high Reynolds, new chaotic patterns can emerge close to walls and the different fields get untidy. This transition is the transition between what we call laminar (tidy) and turbulent (untidy) flows. Turbulence is a process that emerges at high Reynolds number and allows more dissipation than expected with laminar flows via the emergence of eddies of different length scales (see §33 of \cite{landau}). Theoretical resolution of such dynamics is an open problem and direct numerical simulations (DNS) are highly challenging because of their huge computational costs. Hence, different technologies have been developed in order to reduce the computational complexity of the task, for example, large eddy simulations (LES) try to filter in space the pressure and velocity fields and model the smallest eddies by adding dissipation. Another one, that we will use here, try to model all the scales of eddies by doing an ensemble average on the velocity and pressure fields. An ensemble average is a theoretical average over multiple equivalent experiments, this can also be equivalently replaced by a time averaging on a time scale big compared to turbulent fluctuations rate and small compared to the macroscopic evolution rate of the fluid. We write:
+	\begin{align}
+		u = \Bar{u} + u', \quad p = \Bar{p} + p'
+	\end{align}
+	where $\Bar{\cdot}$ denotes an ensemble averaged quantity and $\cdot '$ its fluctuations. If we set those expressions into the incompressible Navier–Stokes equations and take the ensemble averaging of the equations, we get:
+	\begin{align}
+		\partial_i \Bar{u}_i &= 0 \\
+		\partial_t\Bar{u}_i + \partial_j(\Bar{u}_i\Bar{u}_j) &= -\partial_i\left(\frac{\Bar{p}}{\rho}\right) + \nu\partial^2_{jj}\Bar{u}_i - \frac{1}{\rho}\partial_j (\sigma_t)_{ij}, \quad i\in\{1,2,3\}
+	\end{align}
+	where $(\sigma_t)_{ij} := -\rho\overline{u'_i u'_j}$ is called the Reynolds stress tensor. We now have a new unknown in our equations and the problem is not close anymore. A common assumption known as the Boussinesq hypothesis is to write the Reynolds stress tensor in the same way as the viscous stress tensor:
+	\begin{align}
+		(\sigma_t)_{ij} &= \rho\nu_t\left(\partial_i\Bar{u}_j + \partial_j\Bar{u}_i\right) - \frac{2}{3}\rho k \\
+		k &= \frac{1}{2}\overline{u'_i u'_i}
+	\end{align}
+	where $\nu_t$ is called the turbulent kinematic viscosity and $k$ the specific kinematic energy of turbulence. The term $-2\rho k/3$ is set to ensure the null value of the trace of $\sigma_t$. By defining an effective pressure, abusively denoted by the same symbol, $\Bar{p}$, $\Bar{p} := \Bar{p} + 2\rho k$, we find:
+	\begin{align}
+		\partial_i \Bar{u}_i &= 0 \\
+		\partial_t\Bar{u}_i + \partial_j(\Bar{u}_i\Bar{u}_j) &= -\partial_i\left(\frac{\Bar{p}}{\rho}\right) + \partial_{j}\left[(\nu + \nu_t)\partial_{j}\Bar{u}_i\right], \quad i\in\{1,2,3\}
+	\end{align}
+	This set of equations is known as the Reynolds-Averaged Navier–Stokes (RANS) equations. In order to close our set of equations, we need a last equation for $\nu_t$. Such equation is called a turbulence model and plenty of them have been developed in the last decades to recover experimental results in certain environments. We very briefly present two turbulence models that we are going to use in our experiments and let the details of those model in the references given. The Spalart-Allmaras model \cite{spalart} is a one-equation model designed for aerodynamics problems, it involves a modified viscosity called $\Tilde{\nu}$. The $k-\omega$ SST model \cite{SST} is the blending of two two-equations turbulence model, namely the $k-\varepsilon$ and the $k-\omega$ models \cite{kepsilon, komega}, and it extends the domain of application of both by switching models where it is more relevant to use one instead of another. It involves two quantities, the specific kinematic turbulent energy $k$ and the specific turbulence dissipation rate $\omega$.
+	
+	In the compressible case, a mass-average is applied to the Navier–Stokes equations, for example in the case of the velocity, we use:
+	\begin{align}
+		\Tilde{u} = \frac{1}{\Bar{\rho}}\overline{\rho u}
+	\end{align}
+	and we can decompose the velocity in a mass-averaged term and a fluctuation term:
+	\begin{align}
+		u = \Tilde{u} + u''
+	\end{align}
+	By doing this for different quantities such as specific energy, specific enthalpy, temperature etc... we can write a new set of equations in a similar form as \ref{eq:NS} - \ref{eq:energy_eq}. This is called the Favre-Averaged Navier–Stokes equations, details can be found in chapter 5 of \cite{wilcox}.
+	
+	Finally, the RANS equations are the equations solved by the \emph{simpleFoam} solver and the Favre-Averaged Navier–Stokes equations the ones solved by the \emph{rhoSimpleFoam} solver in the OpenFOAM suite. We compare our results with compressible simulations and the results given in the TMR \cite{TMR} in Appendix~\ref{ap:validation}.
+	
+	\section{Force Coefficients}	
+	The stress force $df$ acting on a face of area $dS$ and normal $n$ is:
+	\begin{align}
+		df = -pn + 2\mu S\cdot n
+	\end{align}
+	We can conclude that for a geometry of surface $\mathcal{S}$, the stress force $F$ acting on it can be computed via:
+	\begin{align}
+		F &= \oint_\mathcal{S} \sigma\cdot n dS \\
+		&= -\oint_\mathcal{S} pndS + \oint_\mathcal{S} 2\mu S\cdot n dS
+	\end{align}
+	We call the term $P := -pn$ the wall pressure and the term $\tau := 2\mu S\cdot n$ the wall shear stress. Ultimately, we call drag $D$ and lift $L$ the component of $F$ that are respectively parallel and orthogonal to the main direction of the flow. If $u_{\parallel}$ is the unit direction of the velocity vector and $u_{\perp}$ its orthogonal unit direction, we have:
+	\begin{align}
+		D &= \left(\oint_\mathcal{S} p dS + \oint_\mathcal{S} \tau dS\right)\cdot u_{\parallel} \\
+		L &= \left(\oint_\mathcal{S} p dS + \oint_\mathcal{S} \tau dS\right)\cdot u_{\perp}
+	\end{align}
+	
+	In the case of RANS equations, we add terms that take in account the effect of turbulence over the geometry. The pressure $p$ is replaced by an effective mean-field pressure $\Bar{p}$ and the wall shear stress is given by $\tau = 2(\mu + \mu_t)S\cdot n$ where $\mu_t$ is the dynamic turbulent viscosity. However, as the turbulent viscosity is null over the airfoil, we recover $\tau = 2\mu S\cdot n$.
+	
+	For incompressible fluids we also often divide those quantities by $\rho$ the density of the fluid and solvers often express the results in terms of reduced pressure $\Bar{p} \rightarrow \Bar{p}/\rho$ and kinematic (turbulent) viscosity $\nu := \mu/\rho$ ($\nu_t := \mu_t/\rho$). We use this convention in this work.
+	
+	\section{Airfoil Generation and Statistics}\label{ap:airfoil}
+	In this section, we review the construction of the NACA 4 and 5 digits \cite{naca}. Both of them are built in the same manner and rely only on 3 or 4 parameters for the 4 or 5 digits respectively. Each airfoil is defined via a camber lined and an envelope, the only difference between the 4 and 5 digits is the definition of the camber line.
+	
+	\paragraph{NACA 4 digits.} Those profiles are defined by the name NACA followed by four digits MPXX where the first two digits M and P defined the camber line and the last two digits XX defined the maximum thickness of the profile in percentage of the chord (the total length of the airfoil). More precisely, M defines the maximum ordinate of the camber line in hundredth of the chord and P the position of this maximum from the leading edge in tenth of the chord. If we denote the chord $c$, the camber line of the NACA 4312 profile will have a maximum ordinate of camber of $y = 0.04c$, at $x = 0.3c$ and the profile will have a maximum thickness of $0.12c$. Also, the leading edge and the trailing edge of each airfoil are always taken at the points $(0, 0)$ and $(c, 0)$ in the $x-y$ plane respectively. From this point, all the abscissas and ordinates will be given in length per chord.
+	
+	For the NACA 00XX, a symmetrical profile, the camber line is a straight line from $x = 0$ to $x = 1$ and the upper surface is defined by the graph of the function:
+	\begin{align}
+		y_t(x) = \frac{t}{0.2}\left(0.2969\sqrt{x} - 0.126x - 0.3516x^2 + 0.2843x^3 - 0.1015x^4\right)
+	\end{align}
+	where $t := XX/100$ is the thickness defined with the two last digits. This definition involve a trailing edge with a thickness of $0.002c$. If, for example for numerical propose, we want to have a thickness of 0 at the trailing edge, we can change the coefficient of the fourth order term from $-0.1015$ to $-0.1036$. The lower surface is defined as $-y_t$.
+	
+	For a generic NACA MPXX, The camber line is defined by the first two digits and follow the graph of the function:
+	\begin{align}
+		y_c(x) =
+		\begin{cases}
+			m\frac{x}{p^2}(2p - x), \quad 0 \leqslant x\leqslant p \\
+			m\frac{1 - x}{(1-p)^2}(1 + x - 2p), \quad p < x \leqslant 1
+		\end{cases}
+	\end{align}
+	where $m := 0.01$M and $p:= 0.1$P.
+	
+	Finally, the upper surface of a generic NACA MPXX is given by the set of coordinates $(x_u, y_u)$ defined as:
+	\begin{align}
+		\begin{cases}
+			x_u = x - y_t(x)\sin\theta(x) \\
+			y_u = y_c(x) + y_t\cos\theta(x) \qquad \textrm{for } x\in [0,1]\\
+			\theta(x) = \arctan y_c'(x)
+		\end{cases}
+	\end{align}
+	where $y_c'$ is the derivative of $y_c$. The lower surface is given by a similar set of coordinates $(x_l, y_l)$ defined as:
+	\begin{align}
+		\begin{cases}
+			x_l = x + y_t(x)\sin\theta(x) \\
+			y_u = y_c(x) - y_t\cos\theta(x) \qquad \textrm{for } x\in [0,1]\\
+			\theta(x) = \arctan y_c'(x)
+		\end{cases}
+	\end{align}
+	
+	\paragraph{NACA 5 digits.} As we already stated earlier, the only difference between the NACA 4 and 5 digits is the definition of the camber line. In the case of the 5-digits LPQXX, the 3 first parameters defining the camber line are less explicit than for the 4 digits case but allow more complex shapes. The last two are the same as in the 4-digits case (\emph{i.e.} maximum thickness in hundredth of chord). The first digit L controls the camber implicitly via an optimal lift coefficient $C_L$, \emph{i.e.} it will give you the camber of the airfoil such that $C_L = 0.15$L. The second digit P is almost the same as in the 4-digits case, \emph{i.e.} it defines the position of the maximum of camber of the camber line in twentieth of chord. Lastly, the third digit Q is either 0 or 1 and represent a standard camber (similar to the 4-digits case) for 0 and a reflex camber for 1. The reflex camber is a double cambered line that makes the profile more stable (by setting the pitch coefficient to 0).
+	
+	For a generic NACA LPQXX, the standard camber line is defined via the graph of the function:
+	\begin{align}
+		y_c(x) = 
+		\begin{cases}
+			K_1\left(m^2(3-m)x - 3mx^2 + x^3\right), \quad 0\leqslant m \\
+			K_1m^3(1-x), \quad m< x \leqslant 1
+		\end{cases}
+	\end{align}
+	where $m$ is not the position of the maximum camber $p := 0.05$P but is related to it via the equation:
+	\begin{align}\label{eq:max_camb}
+		p = m\left(1-\sqrt{\frac{m}{3}}\right)
+	\end{align}
+	and $K_1$ is related to $C_L$ via:
+	\begin{align}
+		\begin{cases}
+			K_1 = \frac{C_L}{Q} \\
+			Q = \frac{3m - 7m^2 + 8m^3 - 4m^4}{\sqrt{m(1-m)}} - \frac{3}{2}(1-2m)\left(\frac{\pi}{2} - \arcsin(1-2m)\right)
+		\end{cases}
+	\end{align}
+	
+	The reflex camber line is defined via the graph of the function:
+	\begin{align}
+		y_c(x) = 
+		\begin{cases}
+			K_1\left(m^3(1-x) - K_2(1-m)^3x + (x-m)^3\right), \quad 0\leqslant m \\
+			K_1\left(m^3(1-x) - K_2(1-m)^3x + K_2(x-m)^3\right), \quad m< x \leqslant 1
+		\end{cases}
+	\end{align}
+	where $m$ and $K_1$ are defined as in the standard case and $K_2$ is defined via:
+	\begin{align}
+		K_2 = \frac{3(m - p)^2 - m^3}{(1-m)^3}
+	\end{align}
+	We use a standard Newton's method to numerically solve equation \ref{eq:max_camb} in $m$.
+	
+	\paragraph{Parameter sets.}\label{sec:naca_sample} In Table~\ref{tab:sample-NACA} we give the parameter sets for the sampling. Let us underline that the digits are not necessarily integers. Also, for the values of P in the NACA 4-digits case, we actually uniformly sample in $[0, 7]$ and set the values of P strictly inferior to 1.5 to 0. This implies that the NACA 4-digits set is slightly biased towards symmetrical profiles. We assume that this bias is not of a great importance in the machine learning task. This bias could actually be leveraged to produce a smaller dataset of only symmetrical profiles where we can test the performance of invariant/equivariant models with respect to the plane symmetry of axis $y = 0$. Finally, we set the chord $c$ to \SI{1}{\meter} for all of the airfoils. In Figure~\ref{fig:naca_stats}, we show statistics of the airfoil parameters. 
+	
+	\begin{figure}
+		\centering
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[width = \linewidth]{Appendix/Airfoil/full_train.png}
+			\caption{}
+		\end{subfigure}
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[width = \linewidth]{Appendix/Airfoil/full_test.png}
+			\caption{}
+		\end{subfigure}
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[width = \linewidth]{Appendix/Airfoil/small_train.png}
+			\caption{}
+		\end{subfigure}
+		
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[width = \linewidth]{Appendix/Airfoil/reynolds_train.png}
+			\caption{}
+		\end{subfigure}
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[width = \linewidth]{Appendix/Airfoil/reynolds_test.png}
+			\caption{}
+		\end{subfigure}
+		
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[width = \linewidth]{Appendix/Airfoil/aoa_train.png}
+			\caption{}
+		\end{subfigure}
+		\begin{subfigure}{0.32\textwidth}
+			\centering
+			\includegraphics[width = \linewidth]{Appendix/Airfoil/aoa_test.png}
+			\caption{}
+		\end{subfigure}
+		\caption{Histogram of the different sampled parameters for the airfoils. For each subfigure, the top line represents the parameters of NACA 4-digits, the middle line, the parameters of the NACA 5-digits along with the left plot of the bottom line. The last two plots of the bottom lines are the histograms for the Reynolds number and the angle of attack. Each subfigure represents a different regime: (a)-(b) Full data regime (c) Scarce data regime (d)-(e) Reynolds extrapolation regime (e)-(f) Angle of attack extrapolation regime. Trainsets are in blue and testsets in yellow.}
+		\label{fig:naca_stats}
+	\end{figure}
+
+	\section{Meshing Procedure}\label{ap:meshing}
+	The construction of meshes is at the core of CFD tasks. A mesh completely determine the quality of a simulation and its characteristics. For CFD problems, the local size of cells gives the information of the resolved scales. For example, in turbulent regime, it would be impossible to simulate eddies of characteristic length smaller than your typical cell length scale. Unfortunately, it is often impossible to run direct numerical simulation (DNS) to correctly simulate all the length scale of a fluid dynamics problem as it implies a prohibitive quantity of cells in the mesh. Another technology, large eddy simulation (LES), tries to model the smallest length scales via a theoretical local filtering of the solution in order to reduce the characteristic length scale of the smallest cell needed to correctly simulate the phenomena studied. However, this can still lead to a prohibitive quantity of cells in the mesh. Finally, Reynolds-Averaged-Simulation (RAS), use the RANS equations described in section \ref{ap:RANS} to model all the length scales involved in turbulence via a theoretical ensemble averaging. This allows to recover a mean field solution which requires much less cells in the mesh. In this work, we chose to run steady-state RAS to recover mean steady-state fields around airfoils.
+	
+	Another aspect of the construction of a mesh is the choice of a strategy to resolve the boundary layers close to an obstacle. There are two strategies but each are based on the value of the $y^+$. This quantity represents a local Reynolds close to the obstacle and is defined as:
+	\begin{align}
+		\begin{cases}
+			y^+ = \frac{yu_\tau}{\nu} \\
+			u_\tau = \sqrt{\frac{\tau_w}{\rho}}
+		\end{cases}
+	\end{align}
+	where $y$ is the distance from the wall, $\tau_w$ the magnitude of the wall shear stress, $\rho$ the density of the fluid and $\nu$ the kinematic viscosity of the fluid. In order to compute the $y^+$, experimental values on thin plates give the order of magnitude of the wall shear stress term \cite{boundary}. When we take $y$ as the height of the first cell close to the wall, we can define two strategies:
+	\begin{itemize}
+		\item \emph{Low-Reynolds simulation:} resolve entirely the boundary layer, $y^+ < 1$
+		\item \emph{High-Reynolds simulation:} model the boundary layer via a so-called wall function, $y^+ \sim 10^2$
+	\end{itemize}
+	As we are interested in accurate force coefficients at the surface of our airfoils, we chose the first strategy to avoid modelling close to the wall. This implies that we need the maximum height $y$ of our first cells close to the wall to be smaller than $\nu/u_\tau$. In our case, we chose $y = \SI{2}{\micro\meter}$ which set the $y^+$ to be around 1 in the worst case of our design space.
+	
+	Let us now present the mesh we use for our simulations. This is inspired by the National Aeronautics and Space Administration (NASA) mesh used in \cite{TMR} to recover experimental force coefficients on the NACA 0012 and 4412. We do not pretend to have the same quality of mesh as the NASA but we still argue that our mesh is well suited for our case. We show it in the next sections by comparing our results to experimental results. Meshes have been generated with the help of \emph{blockMesh}, a hexahedral mesh generator included in the OpenFOAM suite that works by defining blocks. With the help of a dictionnary (namely the \emph{blockMeshDict} file), we set the number of cells and the grading we want to fully determined the meshing inside each block. A scheme of how the domain is divided in multiple blocks and a result of the meshing procedure on the NACA 0012 with an angle of attack of \SI{10}{\degree} is given in Figure~\ref{fig:sch_mesh}. More precisely, as in the NASA mesh, a C-Grid domain is defined with a radius and a length of \SI{200}{\meter} (which means 200 chords here). This is smaller than the 500 chords length domain of the NASA but we found it big enough to be insensible to boundary conditions. We now use the index of the nodes, edges and blocks defined on Figure~\ref{fig:sch_mesh}. For the edges 310, 411, 58, 69 and 710, the smallest cell is of height \SI{2}{\micro\meter} as already said above and we set the expansion ratio (the length ratio between two consecutive cells) to 1.075. For the edges 01 and 12 the smallest cell is of height \SI{100}{\micro\meter} and the expansion ratio is also set to 1.075. At the upper surface of the airfoil, at the leading edge, the smallest cell is of width \SI{10}{\micro\meter} (at node 8) and we set the expansion ratio to 1.025 until roughly the maximum of camber of the airfoil (at node 11). From node 11 to node 10, an automatic expansion ratio is computed to fill the entire segment. Almost the same procedure is applied at the lower surface of the airfoil, the only difference is that, for consistency, the expansion ratio between node 9 and 10 is set such that the last cells (at node 10) is of the same width as the one at the upper surface. Edge 34 or 67 have a fix grading of 1 and edge 45 or 56 have a grading such that the width of the cell at the junction of blocks 2 and 3 or 4 and 5 are the same (this is only true at node 4 or 6 and a significant width difference can be seen at the center of edges 411 or 69). Finally edges 07, 110 and 23 have a smallest cell of the same width as for block 2 or 5 (with the same remark, this is true only at nodes 3, 7 and 10) and a grading of 1.075 is applied.
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width = \textwidth]{Dataset/mesh_scheme.pdf}
+		\caption{Scheme of the mesh template. This is a scheme for the NACA 0012 with an angle of attack of \SI{10}{\degree}. The aerofoil patch is highlighted in red, the freestream patch is highlighted in green and the internal patch is the union of the blocks 0 to 5 highlighted in blue. The indices of nodes and blocks are the same as in the \emph{blockMeshDict} file.}
+		\label{fig:sch_mesh}
+	\end{figure}
+	
+	In Figure~\ref{fig:data_stats} we give the number of cells and nodes in simulations of the dataset. We also give those quantities for the cropped simulations used for the ML tasks.
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width = \textwidth]{Appendix/Dataset/cell_stats.png}
+		\caption{Histograms of the number of cells and nodes in simulations of the dataset. (top left) Number of cells and nodes in internal meshes for CFD simulations (top right) Numbers of cells and nodes in internal meshes for cropped simulations (bottom left) Number of nodes on airfoils patches (bottom right) Number of nodes on freestream patches. For the bottom plots, we only give the number of nodes as they are equal to the number of cells.}
+		\label{fig:data_stats}
+	\end{figure}
+	
+%	\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+	\section{Boundary Conditions}\label{ap:boundary}
+	In this section, we explicit the different boundary conditions set on the different patches of the mesh. The quantities needed for a simulation depend on whether we run incompressible or compressible physics and on the turbulence model chosen. In Table \ref{tab:boundaries}, \ref{tab:bound_quant} and \ref{tab:bound_cond} we give the different OpenFOAM settings used for the different fields involved in the simulation, that are:
+	\begin{itemize}
+		\item $U$ : ensemble averaged velocity in \si{\meter\per\second}
+		\item $p$ : ensemble averaged effective pressure in \si{\pascal} (in the incompressible case the pressure is divided by the density $\rho$, $p\rightarrow p/\rho$)
+		\item $\nu_t$ : kinematic turbulent viscosity in \si{\square\meter\per\second}
+		\item $\Tilde{\nu}$\footnote{Only for the Spalart-Allmaras turbulent model.}: Spalart-Allmaras variable in \si{\square\meter\per\second}
+		\item $k$\footnotemark[2]{} : turbulent kinetic energy in \si{\joule}
+		\item $\omega$\footnotemark[2]{} : specific dissipation rate via turbulence in \si{\per\second}
+		\item $T$\footnotemark[3]{} : temperature in \si{\kelvin}
+		\item $\alpha_t$\footnotemark[3]{} : turbulent thermal diffusivity in \si{\square\meter\per\second}
+	\end{itemize}
+	\footnotetext[2]{Only for the $k-\omega$ SST turbulent model \cite{SST}.}
+	\footnotetext[3]{Only in the case of compressible simulations.}
+	
+	\begin{table}
+		\centering
+		\begin{threeparttable}
+			\caption{Boundary conditions set on the different patches of the mesh for compressible and incompressible simulations. Values of the constants are given for the air at sea level and at \SI{298.15}{\kelvin}.}
+			\begin{tabular}{cccc}
+				\toprule
+				Fields & Internal & Aerofoil & Freestream \\
+				\midrule
+				$U$ & $U_\infty$ & \emph{noSlip} & \emph{freestreamVelocity} \\
+				$p$ & 0\tnote{$\star$} & \emph{zeroGradient} & \emph{freestreamPressure} \\
+				$\nu_t$ & $\nu$ & \emph{nutLowReWallFunction} & \emph{freestream} \\
+				$\Tilde{\nu}$ & $4\nu$ & \emph{fixedValue} & \emph{freestream} \\
+				$k$ & $0.001U_\infty^2/Re_L$ & \emph{fixedValue} & \emph{freesteam} \\
+				$\omega$ & $5U_\infty/L$ & \emph{omegaWallFunction} & \emph{freestream} \\
+				$T$ & \SI{298.15}{\kelvin} & \emph{zeroGradient} & \emph{freestream} \\
+				$\alpha_t$ & $\nu_t/Pr_t$ & \emph{compressible::alphatWallFunction} & \emph{calculated} \\
+				\bottomrule
+			\end{tabular}
+			\begin{tablenotes}
+				\item [$\star$] This value has to be set to an absolute pressure value, in our case \SI{1.013e5}{\pascal}, for the compressible case.
+			\end{tablenotes}
+			\label{tab:boundaries}
+		\end{threeparttable}
+	\end{table}
+	
+	\begin{table}
+		\caption{Definition of the quantities involved in Table \ref{tab:boundaries} and their values for the air at sea level and at a temperature of \SI{298.15}{\kelvin} (\SI{25}{\degreeCelsius}).}
+		\centering
+		\begin{tabular}{ccc}
+			\toprule
+			Quantity & Definition & Value \\
+			\midrule
+			$\rho$ & Density of the fluid & $\SI{1.184}{\kilogram\per\cubic\meter}$ \\
+			$\nu$ & Kinematic viscosity of the fluid & $\SI{1.56e-5}{\square\meter\per\second}$ \\
+			$L$ & Length of the domain & $\SI{400}{\meter}$ \\
+			$U_\infty$ & Velocity at the inlet & - \\
+			$Re_L$ & Reynolds number computed with $L$ & $U_\infty L/\nu$ \\
+			$Pr_t$ & Turbulent Prandtl number (constant) & $0.85$ \\
+			\bottomrule
+		\end{tabular}
+		\label{tab:bound_quant}
+	\end{table}
+	
+	\begin{table}
+		\caption{Definition of the boundary conditions involved in Table \ref{tab:boundaries} and values we use when asked by OpenFOAM. The values given for \emph{fixedValue} are the values of $k$ and $\Tilde{\nu}$ at the surface of the airfoil. The quantity $\beta_1 = 0.075$ is a constant of the $k-\omega$ model \cite{komega} and $\Delta y = \SI{2}{\micro\meter}$ the height of the first cells of the boundary layer.}
+		\centering
+		\begin{tabular}{ccc}
+			\toprule
+			Boundary condition & Definition & Value \\
+			\midrule
+			\emph{fixedValue} & Set the quantity to a constant & \SI{0}{\joule}/\SI{0}{\square\meter\per\second} \vspace{0.2cm} \\
+			\emph{calculated} & Derived from other quantities & Internal field value \vspace{0.2cm} \\
+			\emph{noSlip} & Set the velocity to 0 & - \vspace{0.2cm} \\
+			& Set the field at the &  \\
+			\emph{zeroGradient} & boundary to the value & - \\
+			& of the internal field & \vspace{0.2cm} \\
+			& Mixed boundary condition & \\
+			\emph{freestream} & between \emph{fixedValue} and & Internal field value\\ 
+			& \emph{zeroGradient} depending on & \\
+			& the direction of the flux & \vspace{0.2cm} \\
+			& Same as \emph{freestream} but & \\
+			\emph{freestreamVelocity} & switches in accordance with & Internal field value\\ 
+			& \emph{freestreamPressure} & \vspace{0.2cm} \\
+			& Same as \emph{freestream} but & \\
+			\emph{freestreamPressure} & switches in accordance with & Internal field value\\ 
+			& \emph{freestreamVelocity} & \vspace{0.2cm} \\
+			\emph{nutLowReWallFunction} & Set the turbulent viscosity to 0 & \SI{0}{\square\meter\per\second} \vspace{0.2cm} \\
+			\emph{omegaWallFunction} & For low Reynolds simulation, & $\frac{6\nu}{\beta_1\Delta y^2}$ \\
+			& equivalent to \emph{fixedValue} & \vspace{0.2cm} \\
+			\emph{compressible::alphatWallFunction} & Equivalent to \emph{fixedValue} & \SI{0}{\square\meter\per\second} \\
+			& with a value of $\nu_t/Pr_t$ & \\
+			\bottomrule
+		\end{tabular}
+		\label{tab:bound_cond}
+	\end{table}
+	
+	We do not present here the discretization schemes chosen for the simulations, nor the linear solver and hyperparameters of the SIMPLE algorithm. You can find them in the \emph{fvSchemes} and \emph{fvSolution} dictionnaries respectively. We just mention that we used the SIMPLEC \cite{SIMPLEC} algorithm for the incompressible case and the classical SIMPLE \cite{SIMPLE} one for the compressible setup as the SIMPLEC was not stable in this case.
+	
+	\section{Simulation Validation}\label{ap:validation}
+	In this section, we test our mesh and boundary conditions on two different problems, with two turbulence models and in the compressible and incompressible settings, in order to validate the choice made in this work. To do so, we use the experimental data produced by the NASA and available on the Turbulence Modeling Resource (TMR) website of the Langley Research Center \cite{TMR} for the NACA 0012 and 4412.
+	
+	\paragraph{NACA 0012 airfoil.} We compare our results with experimental data for the force coefficients done on the NACA 0012 \cite{NACA0012-1, NACA0012-2}. We restricted our study to the case of a Reynolds of 6 million for different angle of attacks (see Table XIII \cite{NACA0012-2}). In our simulations, we run an incompressible solver with the properties of the air at \SI{298.15}{\kelvin} and at sea level (see Table \ref{tab:bound_quant}) which gives an inlet velocity $U_\infty$ of \SI{93.6}{\meter\per\second} with a characteristic length equal to the chord of the airfoil (in our case \SI{1}{\meter}). The celerity of sound in this medium is taken to be \SI{346.1}{\meter\per\second}, which gives a Mach number ($Ma := U_\infty/c$) of roughly 0.27. We often set a limit a 0.3 for the Mach number in order to run incompressible simulations, and as we are close to this limit, we run incompressible and compressible simulations for an additional restricted set of angle of attacks of \SI{0}{\degree} and \SI{10}{\degree}. The pressure coefficient at the surface of the airfoil are compared to another set of experimental data (Table II of \cite{NACA0012-1}) done at Mach 0.3 and Reynolds 6 million for this two angles of attack (more precisely at angle \SI{0.0169}{\degree} and \SI{10.0254}{\degree}). Moreover, we tried with the Spalart-Allmaras and $k-\omega$ SST models of turbulence.
+	
+	The pressure coefficient $c_p$ at the surface of the airfoil is a dimensionless coefficient defined as:
+	\begin{align}
+		c_p := \frac{\Bar{p}-\Bar{p}_\infty}{q_\infty}, \qquad q_\infty := \frac{1}{2}U_\infty^2 A
+	\end{align}
+	where $\Bar{p}$ is the mean-field reduced pressure, $\Bar{p}_\infty$ the far field pressure (set to 0 in the incompressible case), $U_\infty$ is the magnitude of the inlet velocity and $A$ is the characteristic area of the problem, we take here $A = \SI{1}{\square\meter}$.
+	
+	In Figure \ref{fig:cp_0012_0} and \ref{fig:cp_0012_10}, the surface pressure coefficient is given and we see no significant difference between the two models nor between the compressible and incompressible cases. All the simulations are in good agreement with the experiments.
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width = \linewidth]{Appendix/Validation/cp_0012_0.png}
+		\caption{Pressure coefficient at the surface of the airfoil for the NACA 0012 at an angle of attack of \SI{0}{\degree} in the incompressible (left) and compressible (right) cases for the Spalart-Allamaras,  $k-\omega$ SST models and the experiments with respect to the abscissas in chord length. The points on the upper and lower surfaces are given in different colors for the simulations.}
+		\label{fig:cp_0012_0}
+	\end{figure}
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width = \linewidth]{Appendix/Validation/cp_0012_10.png}
+		\caption{Pressure coefficient at the surface of the airfoil for the NACA 0012 at an angle of attack of \SI{10}{\degree} in the incompressible (left) and compressible (right) cases for the Spalart-Allamaras,  $k-\omega$ SST models and the experiments with respect to the abscissas in chord length. The points on the upper and lower surfaces are given in different colors for the simulations.}
+		\label{fig:cp_0012_10}
+	\end{figure}
+	
+	In Figure \ref{fig:force_0012} are displayed the drag and lift coefficients with respect to angle of attacks and the drag coefficient with respect to the lift coefficient for the two models and the experiments. In the compressible case, only \SI{0}{\degree} and \SI{10}{\degree} have been simulated for time and stability reasons, no significant differences are present with the incompressible simulations. In the incompressible case, a missing point in the plot means that the simulation was unstable and we did not manage to make it converge correctly. We can see that both compressible and incompressible solver gives a slightly over estimated drag with respect to experiments, this is in agreement with the TMR. We also see that the $k-\omega$ SST model is more stable than the Spalart-Allmaras model, we noticed a faster convergence for the first too. Finally, the $k-\omega$ SST model fits better the experiments than the Spalart-Allamaras model. In total, both model are in good agreement with experimental data but the $k-\omega$ SST model looks more stable, faster to converge and more accurate than the Spalart-Allamaras.
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width = \linewidth]{Appendix/Validation/force_0012.png}
+		\caption{Drag and lift coefficients with respect to angle of attacks and to each other in the case of the NACA 0012. The compressible simulations have only be done at \SI{0}{\degree} and \SI{10}{\degree}.}
+		\label{fig:force_0012}
+	\end{figure}
+	
+	From this point, we only run incompressible simulations as this validation case showed no distinctions between compressible and incompressible simulations. We now test our setup on another validation case in order to chose between the two turbulence models.
+	
+	\paragraph{NACA 4412 airfoil.} In this setup, the experimental data \cite{NACA4412} are done with a NACA 4412 at an angle of attack of \SI{13.87}{\degree} and a Reynolds number of 1.52 million. The values of the experimental data are the one given on the NACA 4412 page of the TMR. The values found on this website are slightly different from the one found in the original papers, moreover, the normalization factor for the pressure coefficient is computed with a reference velocity $U_{ref}$ of roughly $0.93U_\infty$ but, as in the NASA simulations, the results better fit when using a normalization factor computed with $U_\infty$. This is underlined on the TMR page and incite us to take this validation case only as a qualitative validation.
+	
+	In Figure \ref{fig:cp_4412}, the pressure coefficient is given with a normalization factor computed with the magnitude of the inlet velocity $U_\infty$. Both turbulence models results are in good agreement with the experiments. 
+	\begin{figure}
+		\centering
+		\includegraphics[width = \linewidth]{Appendix/Validation/cp_4412.png}
+		\caption{Pressure coefficient at the surface of a NACA 4412 with an angle of attack of \SI{13.87}{\degree} and a Reynolds of 1.52 million. The normalization of the pressure coefficient is computed with the magnitude of the inlet velocity $U_\infty$. Are displayed the experimental data, the Spalart-Allmaras and $k-\omega$ SST models incompressible results.}
+		\label{fig:cp_4412}
+	\end{figure}
+	
+	In Figure \ref{fig:bl_4412}, we look at the boundary layer of the airfoil at different abscissas. Here the $x$ and $y$ components of the velocity (denoted by $u$ and $v$ respectively) are normalized by $U_{ref}$ and the term $u'v'$, corresponding to the shear stress term of the Reynolds stress tensor, is normalized by $U_{ref}^2$. We start each plot at a given point at the surface of the airfoil and take the direction of the normal of the airfoil at this point. Hence, the name $(y - y_0)/c$ for the ordinate of the plot has to be understand as the distance to the airfoil in the normal direction in chord length. Both turbulence models have difficulties to predict correctly the experimental data, this behaviour has already been pointed out in the TMR study of the NACA 4412 and our results are in good agreement with theirs. Moreover, the $k-\omega$ SST model seems to give more realistic results than the Spalart-Allmaras one.
+	
+	\begin{figure}
+		\centering
+		\includegraphics[height = 0.9\textheight]{Appendix/Validation/4412_bl.png}
+		\caption{Boundary layer velocity components and shear Reynolds stress for different point at the surface of the NACA 4412 at a Reynolds number of 1.52 million. Each quantity is normalized either by $U_{ref}$ or $U_{ref}^2$. The ordinate has to be understand as the distance to the given point at the surface of the airfoil following the normal direction.}
+		\label{fig:bl_4412}
+	\end{figure}
+	
+	In total, our simulations on the NACA 0012 and 4412 are in good (at least qualitatively) agreement with the experiments. The incompressible $k-\omega$ SST model setup seems the best candidate for fast, stable and high fidelity simulations. In this work, we keep this setup to generate the dataset.
+	
+	\section{Models architecture}\label{ap:models}
+	For all of the tasks, the same architecture is used in addition with the same hyperparameters. Each model is preceded by an encoder and followed by a decoder both defined as MLP with ReLU activation function, no batch normalization, and with $7-64-64-8$ and $8-64-64-4$ neurons respectively, meaning an dimension of encoding of 8. Those encoder and decoder are trained together with the chosen model.
+	
+	\paragraph{Multi-Layer Perceptron.} The first baseline is another MLP with ReLU activation function and batch normalization before the activation. It has $8-64-64-64-8$ neurons.
+	
+	\paragraph{GraphSAGE.} The GraphSAGE acts on a radius graph of 32000 nodes and radii \SI{5}{\centi\meter}. It is defined with 3 hidden layers and 64 hidden features per node.
+	
+	\paragraph{PointNet.} The PointNet is copied from the segmentation task of \cite{qi2016pointnet}. We chose 8 neurons as a base number and we did not include any batch normalization nor dropout as it was performing badly with.
+	
+	\paragraph{Graph U-Net.} For the Graph U-Net, we defined it with five scales, downsampling by half at each scale and multiplying by two the number of features at each scales. The radii of the radius graphs are \SI{5}{\centi\meter}, \SI{20}{\centi\meter}, \SI{50}{\centi\meter}, \SI{1}{\meter} and \SI{10}{\meter}. The last radii is chosen such that the graph at the coarsest scale is fully connected. Each of those radius graphs have a limit of 64 neighbors per node. For the downsampling, we did not use the gPool method presented in the historical paper \cite{gunet} and replaced it by a random downsampling over the remaining nodes, recreating a radius graph afterwards. This leads to better results. On the upward pass, we chose to aggregate the different informations from the skip connection and the preceding scale by concatenating the features. Finally, we chose to start with 8 features at the finest scale.
+	
+	The learning rate for all of those experiments is set with a one-cycle cosine \cite{onecyclelr}  rate of maximum 0.001, simulations are fed one by one to the different models during training (\emph{i.e.} 32000 nodes with an associated radius graph when needed) and the number of epochs is chosen such that for each task, we have the same number of gradient updates:
+	\begin{itemize}
+		\item \emph{Full data regime:} 400 epochs
+		\item \emph{Scarce data regime:} 1600 epochs
+		\item \emph{Reynolds extrapolation regime:} 635 epochs
+		\item \emph{Angle of attack extrapolation regime:} 398 epochs
+	\end{itemize}
+	
+	Ultimately, the different models are trained on 90\% of the predefined training set of those different regime, the last 10\% have been used as a validation set.
 \end{subappendices}
